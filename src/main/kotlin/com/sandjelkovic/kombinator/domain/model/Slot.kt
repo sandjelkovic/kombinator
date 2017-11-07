@@ -20,5 +20,9 @@ data class Slot(
         var configuration: Combination,
         @Version @JsonIgnore
         var version: Long = 0) {
-    fun value(): BigDecimal = entries.first { it.selected }.value
+    fun value(): BigDecimal = entries.stream()
+            .filter { it.selected }
+            .findAny()
+            .map { it.value }
+            .orElse(BigDecimal.ZERO)
 }
