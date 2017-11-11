@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 
 /**
  * @author sandjelkovic
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.RestController
 class CombinationsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker
 ) {
+
     @GetMapping("/combinations/{id}")
     fun getCombination(@PathVariable id: String): ResponseEntity<Resource<Combination>>? {
-        val combination = Combination(id = id.toLong()) // fake creation
+        val combination = Combination(id = id.toLong(), uuid = UUID.randomUUID()) // fake creation
         return ResponseEntity.ok(resourceProcessorInvoker.invokeProcessorsFor(combination.toResource()))
     }
 }

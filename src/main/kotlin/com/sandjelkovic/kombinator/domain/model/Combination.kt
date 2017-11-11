@@ -1,6 +1,7 @@
 package com.sandjelkovic.kombinator.domain.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
@@ -12,7 +13,8 @@ import javax.validation.constraints.NotBlank
 @Entity
 data class Combination(
         @Id @GeneratedValue
-        var id: Long = 0,
+        var id: Long? = null,
+        var uuid: UUID,
         @Version @JsonIgnore
         var version: Long = 0,
         @NotBlank
