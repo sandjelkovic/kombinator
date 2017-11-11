@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank
 data class Combination(
         @Id @GeneratedValue
         var id: Long? = null,
-        var uuid: UUID,
+        var uuid: UUID? = null,
         @Version @JsonIgnore
         var version: Long = 0,
         @NotBlank
