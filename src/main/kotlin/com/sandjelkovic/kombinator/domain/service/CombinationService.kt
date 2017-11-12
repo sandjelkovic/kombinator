@@ -9,4 +9,5 @@ import java.util.*
  */
 interface CombinationService {
     fun getCombinationByInternalId(id: Long) : Optional<Combination>
+    fun findAllCombinations() : List<Combination>
 }

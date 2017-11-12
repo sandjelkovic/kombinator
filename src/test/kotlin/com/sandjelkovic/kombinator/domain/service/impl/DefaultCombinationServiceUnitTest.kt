@@ -2,8 +2,7 @@ package com.sandjelkovic.kombinator.domain.service.impl
 
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -74,6 +73,34 @@ class DefaultCombinationServiceUnitTest {
 
         verify(repositoryMock, never()).findById(Mockito.any())
 
+    }
+
+    @Test
+    fun findAllCombinations() {
+        val service = DefaultCombinationService(repositoryMock)
+        val mockedCombinations = (1..5)
+                .map { Combination(id = it.toLong()) }
+
+        Mockito.`when`(repositoryMock.findAll())
+                .thenReturn(mockedCombinations)
+
+        val allCombinations = service.findAllCombinations()
+        assertThat(allCombinations, notNullValue())
+        assertThat(allCombinations, not(empty()))
+        assertThat(allCombinations, hasSize(5))
+        assertThat(allCombinations, containsInAnyOrder(*mockedCombinations.toTypedArray()))
+    }
+
+    @Test
+    fun findAllCombinationsEmpty() {
+        val service = DefaultCombinationService(repositoryMock)
+
+        Mockito.`when`(repositoryMock.findAll())
+                .thenReturn(emptyList())
+
+        val allCombinations = service.findAllCombinations()
+        assertThat(allCombinations, notNullValue())
+        assertThat(allCombinations, empty())
     }
 
 }

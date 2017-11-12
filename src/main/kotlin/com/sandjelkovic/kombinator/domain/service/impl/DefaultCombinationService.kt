@@ -10,9 +10,13 @@ import java.util.*
  * @date 11.11.17.
  */
 class DefaultCombinationService(
-        val combinationRepository: CombinationRepository) : CombinationService {
-    override fun getCombinationByInternalId(id: Long): Optional<Combination> =
-            if (id > 0) combinationRepository.findById(id)
-            else Optional.empty()
+        private val combinationRepository: CombinationRepository) : CombinationService {
+    override fun findAllCombinations(): List<Combination> {
+        return combinationRepository.findAll().toList()
+    }
 
+    override fun getCombinationByInternalId(id: Long): Optional<Combination> {
+        return if (id > 0) combinationRepository.findById(id)
+        else Optional.empty()
+    }
 }
