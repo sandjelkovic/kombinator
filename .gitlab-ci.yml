@@ -23,6 +23,7 @@ compile:
   stage: build
   script:
     - 'mvn $MAVEN_CLI_OPTS test-compile'
+    - 'cat target/site/jacoco/index.html'
 
 # Run `verify`.
 # See https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
