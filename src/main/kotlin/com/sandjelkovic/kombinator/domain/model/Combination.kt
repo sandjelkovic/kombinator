@@ -14,12 +14,13 @@ data class Combination(
         @Id @GeneratedValue
         var id: Long? = null,
         var uuid: String? = null,
-        @Version @JsonIgnore
+        @Version
         var version: Long = 0,
         @NotBlank
         var name: String = "",
         @Enumerated(value = EnumType.STRING)
         var visibility: Visibility = Visibility.PRIVATE,
         @OneToMany(fetch = FetchType.LAZY, mappedBy = "configuration", orphanRemoval = true)
+        @JsonIgnore // TODO move to links or DTO
         var slots: List<Slot> = listOf()
 )

@@ -14,6 +14,7 @@ data class Slot(
         var id: Long = 0,
         var name: String = "",
         @OneToMany(fetch = FetchType.LAZY, mappedBy = "slot", orphanRemoval = true, cascade = arrayOf(CascadeType.ALL))
+        @JsonIgnore // TODO move to links or DTO
         var entries: List<SlotEntry> = listOf(),
         var position: Int = 0,
         @ManyToOne

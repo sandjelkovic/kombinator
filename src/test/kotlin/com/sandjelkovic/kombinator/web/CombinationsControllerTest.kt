@@ -3,6 +3,8 @@ package com.sandjelkovic.kombinator.web
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.test.InvalidTestDataException
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.everyItem
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,8 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.*
 
 /**
@@ -47,8 +48,9 @@ class CombinationsControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/combinations/${computerCombination.uuid!!}")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("\$.uuid").exists())
                 .andExpect(jsonPath("\$.uuid").value(computerCombination.uuid!!))
                 .andExpect(jsonPath("\$.name").value(computerCombination.name))
@@ -58,7 +60,7 @@ class CombinationsControllerTest {
     fun getCombinationNotFound() {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/combinations/${UUID.randomUUID()}")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound)
     }
 
@@ -66,7 +68,7 @@ class CombinationsControllerTest {
     fun getCombinationInvalidRequestPath() {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/combinations/invalidUUid")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest)
     }
 
@@ -74,8 +76,35 @@ class CombinationsControllerTest {
     fun getCombinationEmptyRequestPath() {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/combinations/%20")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun getCombinations() {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/combinations")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$._embedded.combinationList").exists())
+                .andExpect(jsonPath("$._embedded.combinationList").isArray)
+                .andExpect(jsonPath("$._embedded.combinationList").isNotEmpty)
+                .andExpect(jsonPath("$..combinationList.length()", jsonListSizeMatcher(5)))
+    }
+
+    private fun jsonListSizeMatcher(number: Number) = everyItem(equalTo(number))
+
+    @Test
+    fun getCombinationsEmpty() {
+        combinationRepository.deleteAll()
+        val contentAsString = mockMvc.perform(
+                MockMvcRequestBuilders.get("/combinations")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isEmpty)
     }
 
 }

@@ -20,8 +20,9 @@ data class SlotEntry(
         var value: BigDecimal = BigDecimal.ZERO,
         var selected: Boolean = false,
         var position: Int = 0,
-        @JsonIgnore @ManyToOne
+        @ManyToOne
+        @JsonIgnore // TODO move to links or DTO
         var slot: Slot? = null,
-        @Version @JsonIgnore
+        @Version
         var version: Long = 0)
 
