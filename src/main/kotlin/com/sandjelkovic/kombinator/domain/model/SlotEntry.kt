@@ -21,7 +21,7 @@ data class SlotEntry(
         var selected: Boolean = false,
         var position: Int = 0,
         @JsonIgnore @ManyToOne
-        var slot: Slot,
+        var slot: Slot = Slot(),
         @Version @JsonIgnore
         var version: Long = 0)
 
