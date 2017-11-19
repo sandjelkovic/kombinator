@@ -13,7 +13,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.*
 
 /**
  * @author sandjelkovic
@@ -38,6 +40,7 @@ class CombinationsControllerTest {
         // for now, rely on global test data
         exampleDataRunner.run()
     }
+
     @Test
     fun getCombination() {
         val computerCombination = combinationRepository.findByName("EPIC Computer").orElseThrow { InvalidTestDataException() }
@@ -45,10 +48,34 @@ class CombinationsControllerTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/combinations/${computerCombination.uuid!!}")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.uuid").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.uuid").value(computerCombination.uuid!!))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.name").value(computerCombination.name))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("\$.uuid").exists())
+                .andExpect(jsonPath("\$.uuid").value(computerCombination.uuid!!))
+                .andExpect(jsonPath("\$.name").value(computerCombination.name))
+    }
+
+    @Test
+    fun getCombinationNotFound() {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/combinations/${UUID.randomUUID()}")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun getCombinationInvalidRequestPath() {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/combinations/invalidUUid")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun getCombinationEmptyRequestPath() {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/combinations/%20")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest)
     }
 
 }

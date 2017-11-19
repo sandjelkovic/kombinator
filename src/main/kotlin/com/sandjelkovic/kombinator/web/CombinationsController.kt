@@ -1,5 +1,6 @@
 package com.sandjelkovic.kombinator.web
 
+import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.service.CombinationService
 import org.springframework.hateoas.Resource
@@ -21,8 +22,13 @@ class CombinationsController(
 
     @GetMapping("/combinations/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>>? {
-        return combinationService.findByUUID(uuid)
-                .map { ResponseEntity.ok(resourceProcessorInvoker.invokeProcessorsFor(it.toResource())) }
-                .orElseGet { ResponseEntity.notFound().build() }
+        return try {
+            combinationService.findByUUID(uuid)
+                    .map { ResponseEntity.ok(resourceProcessorInvoker.invokeProcessorsFor(it.toResource())) }
+                    .orElseGet { ResponseEntity.notFound().build() }
+        } catch (error: InvalidUUIDException) {
+            ResponseEntity.badRequest().build()
+        }
     }
+
 }
