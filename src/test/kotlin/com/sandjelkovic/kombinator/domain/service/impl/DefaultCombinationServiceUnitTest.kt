@@ -1,5 +1,6 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
+import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import org.hamcrest.Matchers.*
@@ -22,7 +23,7 @@ class DefaultCombinationServiceUnitTest {
     private val existingId = 555L
     private val negativeId = -existingId
 
-    private val existingCombination = Combination(id = existingId, uuid = UUID.randomUUID())
+    private val existingCombination = Combination(id = existingId, uuid = UUID.randomUUID().toString())
 
     @Before
     fun setUp() {
@@ -103,4 +104,43 @@ class DefaultCombinationServiceUnitTest {
         assertThat(allCombinations, empty())
     }
 
+    @Test
+    fun findByUUID() {
+        val service = DefaultCombinationService(repositoryMock)
+        val uuid = UUID.randomUUID().toString()
+
+        Mockito.`when`(repositoryMock.findByUuid(uuid.toString()))
+                .thenReturn(Optional.of(Combination(uuid = uuid, name = "Name")))
+
+        val optional = service.findByUUID(uuid.toString())
+        assertThat(optional.isPresent, equalTo(true))
+        assertThat(optional.get().uuid, equalTo(uuid))
+        assertThat(optional.get().name, equalTo("Name"))
+    }
+
+    @Test(expected = InvalidUUIDException::class)
+    fun findByUUIDEmptyUUID() {
+        val service = DefaultCombinationService(repositoryMock)
+
+        val optional = service.findByUUID("")
+    }
+
+    @Test(expected = InvalidUUIDException::class)
+    fun findByUUIDInvalidUUID() {
+        val service = DefaultCombinationService(repositoryMock)
+
+        val optional = service.findByUUID("12ASD")
+    }
+
+    @Test
+    fun findByUUIDNotFound() {
+        val service = DefaultCombinationService(repositoryMock)
+        val uuid = UUID.randomUUID()
+
+        Mockito.`when`(repositoryMock.findByUuid(uuid.toString()))
+                .thenReturn(Optional.empty())
+
+        val optional = service.findByUUID(uuid.toString())
+        assertThat(optional.isPresent, equalTo(false))
+    }
 }

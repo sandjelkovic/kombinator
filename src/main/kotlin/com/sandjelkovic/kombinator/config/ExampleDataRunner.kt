@@ -21,14 +21,14 @@ class ExampleDataRunner(val combinationRepository: CombinationRepository,
     override fun run(vararg args: String?) {
         if (!isExampleDataAlreadyCreated(combinationRepository)) {
 
-            val computer = combinationRepository.save(Combination(uuid = UUID.randomUUID(), name = "EPIC Computer", slots = listOf()))
+            val computer = combinationRepository.save(Combination(uuid = UUID.randomUUID().toString(), name = "EPIC Computer", slots = listOf()))
 
             combinationRepository.saveAll(mutableListOf(
                     computer,
-                    Combination(uuid = UUID.randomUUID(), name = "Shopping priority", slots = listOf()),
-                    Combination(uuid = UUID.randomUUID(), name = "Summer travel priorities", slots = listOf()),
-                    Combination(uuid = UUID.randomUUID(), name = "Living room furniture", slots = listOf()),
-                    Combination(uuid = UUID.randomUUID(), name = "Random list of something", slots = listOf()
+                    Combination(uuid = UUID.randomUUID().toString(), name = "Shopping priority", slots = listOf()),
+                    Combination(uuid = UUID.randomUUID().toString(), name = "Summer travel priorities", slots = listOf()),
+                    Combination(uuid = UUID.randomUUID().toString(), name = "Living room furniture", slots = listOf()),
+                    Combination(uuid = UUID.randomUUID().toString(), name = "Random list of something", slots = listOf()
                     )))
 
             val cpuSlot = slotRepository.save(Slot(name = "CPU", configuration = computer))

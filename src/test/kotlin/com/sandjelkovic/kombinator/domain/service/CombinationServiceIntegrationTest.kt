@@ -47,7 +47,7 @@ class CombinationServiceIntegrationTest {
 
     @Test
     fun getByInternalIdSuccess() {
-        val uuid = UUID.randomUUID()
+        val uuid = UUID.randomUUID().toString()
         val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
 
         val optional = service.getCombinationByInternalId(savedCombination.id!!)
@@ -90,6 +90,33 @@ class CombinationServiceIntegrationTest {
 
         assertThat(retrievedIds, containsInAnyOrder(*savedIdsArray))
     }
+
+    @Test
+    fun findByUUIDSuccess() {
+        val uuid = UUID.randomUUID().toString()
+        val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
+
+        val optional = service.findByUUID(uuid.toString())
+
+        assertThat(optional, notNullValue())
+        assertThat(optional.isPresent, equalTo(true))
+
+        // Hibernate and it's proxies...
+        val retrievedCombination = optional.get().copy()
+
+        assertThat(retrievedCombination.uuid, notNullValue())
+        assertThat(retrievedCombination.uuid, equalTo(uuid))
+        assertThat(retrievedCombination, samePropertyValuesAs(savedCombination))
+    }
+
+    @Test
+    fun findByUUIDNonExisting() {
+        val optional = service.findByUUID(UUID.randomUUID().toString())
+
+        assertThat(optional, notNullValue())
+        assertThat(optional.isPresent, equalTo(false))
+    }
+
 
     fun refreshJPAContext() {
         // Thanks Hibernate and JPA... Great cache you have there, if there would only be a way to turn it off for testing!

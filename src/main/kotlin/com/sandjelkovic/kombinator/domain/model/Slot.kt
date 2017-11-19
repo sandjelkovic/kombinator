@@ -17,7 +17,8 @@ data class Slot(
         var entries: List<SlotEntry> = listOf(),
         var position: Int = 0,
         @ManyToOne
-        var configuration: Combination = Combination(),
+        @JsonIgnore
+        var configuration: Combination? = null,
         @Version @JsonIgnore
         var version: Long = 0) {
     fun value(): BigDecimal = entries.stream()

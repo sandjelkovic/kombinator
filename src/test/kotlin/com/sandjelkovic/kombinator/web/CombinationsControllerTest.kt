@@ -1,5 +1,9 @@
 package com.sandjelkovic.kombinator.web
 
+import com.sandjelkovic.kombinator.config.ExampleDataRunner
+import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
+import com.sandjelkovic.kombinator.test.InvalidTestDataException
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,14 +27,28 @@ class CombinationsControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
+    @Autowired
+    lateinit var combinationRepository: CombinationRepository
+
+    @Autowired
+    lateinit var exampleDataRunner: ExampleDataRunner
+
+    @Before
+    fun before() {
+        // for now, rely on global test data
+        exampleDataRunner.run()
+    }
     @Test
     fun getCombination() {
+        val computerCombination = combinationRepository.findByName("EPIC Computer").orElseThrow { InvalidTestDataException() }
+
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/${1}")
+                MockMvcRequestBuilders.get("/combinations/${computerCombination.uuid!!}")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.id").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.uuid").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.uuid").value(computerCombination.uuid!!))
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.name").value(computerCombination.name))
     }
 
 }
