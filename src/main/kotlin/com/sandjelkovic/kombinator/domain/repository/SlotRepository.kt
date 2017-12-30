@@ -8,4 +8,5 @@ import org.springframework.data.repository.CrudRepository
  * @date 19.11.17.
  */
 interface SlotRepository : CrudRepository<Slot, Long> {
+    fun findByCombinationUuid(combinationUuid: String): List<Slot>
 }

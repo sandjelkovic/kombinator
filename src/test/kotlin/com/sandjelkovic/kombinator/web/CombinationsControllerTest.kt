@@ -3,8 +3,6 @@ package com.sandjelkovic.kombinator.web
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.test.InvalidTestDataException
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.everyItem
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +23,7 @@ import java.util.*
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-class CombinationsControllerTest {
+class CombinationsControllerTest : ControllerTest() {
 
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -44,16 +42,16 @@ class CombinationsControllerTest {
 
     @Test
     fun getCombination() {
-        val computerCombination = combinationRepository.findByName("EPIC Computer").orElseThrow { InvalidTestDataException() }
+        val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/${computerCombination.uuid!!}")
+                MockMvcRequestBuilders.get("/combinations/${combination.uuid!!}")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("\$.uuid").exists())
-                .andExpect(jsonPath("\$.uuid").value(computerCombination.uuid!!))
-                .andExpect(jsonPath("\$.name").value(computerCombination.name))
+                .andExpect(jsonPath("\$.uuid").value(combination.uuid!!))
+                .andExpect(jsonPath("\$.name").value(combination.name))
     }
 
     @Test
@@ -93,8 +91,6 @@ class CombinationsControllerTest {
                 .andExpect(jsonPath("$._embedded.combinationList").isNotEmpty)
                 .andExpect(jsonPath("$..combinationList.length()", jsonListSizeMatcher(5)))
     }
-
-    private fun jsonListSizeMatcher(number: Number) = everyItem(equalTo(number))
 
     @Test
     fun getCombinationsEmpty() {

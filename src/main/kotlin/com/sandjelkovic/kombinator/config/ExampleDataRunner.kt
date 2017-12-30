@@ -31,8 +31,8 @@ class ExampleDataRunner(val combinationRepository: CombinationRepository,
                     Combination(uuid = UUID.randomUUID().toString(), name = "Random list of something", slots = listOf()
                     )))
 
-            val cpuSlot = slotRepository.save(Slot(name = "CPU", configuration = computer))
-            val gpuSlot = slotRepository.save(Slot(name = "GPU", configuration = computer))
+            val cpuSlot = slotRepository.save(Slot(name = "CPU", combination = computer))
+            val gpuSlot = slotRepository.save(Slot(name = "GPU", combination = computer))
 
             slotEntryRepository.save(SlotEntry(name = "Intel i5-4000", data = "Middle range CPU", url = "https://localhost/buyMeAn-i5", position = 0, value = BigDecimal.valueOf(200), slot = cpuSlot, selected = false))
             slotEntryRepository.save(SlotEntry(name = "Intel i7-4000", data = "High range CPU", url = "https://localhost/buyMeAn-i7", position = 2, value = BigDecimal.valueOf(400), slot = cpuSlot, selected = false))

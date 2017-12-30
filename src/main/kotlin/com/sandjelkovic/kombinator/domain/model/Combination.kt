@@ -20,7 +20,7 @@ data class Combination(
         var name: String = "",
         @Enumerated(value = EnumType.STRING)
         var visibility: Visibility = Visibility.PRIVATE,
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "configuration", orphanRemoval = true)
+        @OneToMany(fetch = FetchType.LAZY, mappedBy = "combination", orphanRemoval = true)
         @JsonIgnore // TODO move to links or DTO
         var slots: List<Slot> = listOf()
 )
