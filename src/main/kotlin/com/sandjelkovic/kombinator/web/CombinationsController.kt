@@ -9,6 +9,7 @@ import org.springframework.hateoas.mvc.ResourceProcessorInvoker
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -16,12 +17,13 @@ import org.springframework.web.bind.annotation.RestController
  * @date 7.11.17.
  */
 @RestController
+@RequestMapping("/combinations")
 class CombinationsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker,
         val combinationService: CombinationService
 ) {
 
-    @GetMapping("/combinations/{uuid}")
+    @GetMapping("/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> {
         return try {
             combinationService.findByUUID(uuid)
@@ -32,7 +34,7 @@ class CombinationsController(
         }
     }
 
-    @GetMapping("/combinations")
+    @GetMapping
     fun getAllCombinations(): ResponseEntity<Resources<Combination>> {
         val allCombinations = combinationService.findAllCombinations()
         val resources = Resources(allCombinations)
