@@ -13,8 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.util.*
 
 /**
  * @author sandjelkovic
@@ -47,14 +48,40 @@ class SlotsControllerTest : ControllerTest() {
         val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/${combination.uuid}/slots")
+                get("/combinations/${combination.uuid}/slots")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.slotList").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.slotList").isArray)
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.slotList").isNotEmpty)
-                .andExpect(MockMvcResultMatchers.jsonPath("$..slotList.length()", jsonListSizeMatcher(2)))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$._embedded.slotList").exists())
+                .andExpect(jsonPath("$._embedded.slotList").isArray)
+                .andExpect(jsonPath("$._embedded.slotList").isNotEmpty)
+                .andExpect(jsonPath("$..slotList.length()", jsonListSizeMatcher(2)))
     }
+
+    @Test
+    fun getSlotsEmpty() {
+        val combination = combinationRepository.findByName("Living room furniture").orElseThrow { InvalidTestDataException() }
+
+        mockMvc.perform(
+                get("/combinations/${combination.uuid}/slots")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$._embedded").doesNotExist())
+    }
+
+    @Test
+    fun getSlotsNotExistingCombination() {
+
+        val uuid = UUID.randomUUID()
+
+        mockMvc.perform(
+                get("/combinations/${uuid}/slots")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$._embedded").doesNotExist())
+    }
+
 }
