@@ -7,10 +7,10 @@ import org.springframework.hateoas.Resource
 import org.springframework.hateoas.Resources
 import org.springframework.hateoas.mvc.ResourceProcessorInvoker
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.net.URI
+import javax.validation.Valid
+import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/combinations")
 class CombinationsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker,
-        val combinationService: CombinationService
-) {
+        val combinationService: CombinationService) {
 
     @GetMapping("/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> {
@@ -41,4 +40,13 @@ class CombinationsController(
         return ResponseEntity.ok().body(resourceProcessorInvoker.invokeProcessorsFor(resources))
     }
 
+    @PostMapping
+    fun createCombination(@Valid combination: Combination): ResponseEntity<Void> {
+        return try {
+            val created = combinationService.createCombination(combination)
+            ResponseEntity.created(URI.create("/combinations/${created.uuid}")).build()
+        } catch (exception: ValidationException) {
+            ResponseEntity.badRequest().build<Void>()
+        }
+    }
 }

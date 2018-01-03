@@ -2,6 +2,7 @@ package com.sandjelkovic.kombinator.domain.service
 
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
+import org.assertj.core.api.Assertions
 import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Assert.assertThat
@@ -117,6 +118,19 @@ class CombinationServiceIntegrationTest {
         assertThat(optional.isPresent, equalTo(false))
     }
 
+
+    @Test
+    fun shouldCreateCombination() {
+        val uuid = UUID.randomUUID().toString()
+        combinationRepository.deleteAll()
+
+        val savedCombination = service.createCombination(Combination(name = "Super name")).copy()
+
+        Assertions.assertThat(savedCombination).isNotNull()
+        Assertions.assertThat(savedCombination.name).isEqualTo("Super name")
+        Assertions.assertThat(savedCombination.id).isGreaterThan(0)
+        Assertions.assertThat(savedCombination.uuid).isNotBlank()
+    }
 
     fun refreshJPAContext() {
         // Thanks Hibernate and JPA... Great cache you have there, if there would only be a way to turn it off for testing!

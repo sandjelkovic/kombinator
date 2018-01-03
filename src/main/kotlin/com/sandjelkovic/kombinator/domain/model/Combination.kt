@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank
 data class Combination(
         @Id @GeneratedValue
         var id: Long? = null,
+        @Column(unique = true)
         var uuid: String? = null,
         @Version
         var version: Long = 0,

@@ -11,4 +11,5 @@ interface CombinationService {
     fun getCombinationByInternalId(id: Long) : Optional<Combination>
     fun findAllCombinations() : List<Combination>
     fun findByUUID(uuid: String): Optional<Combination>
+    fun createCombination(combination: Combination): Combination
 }

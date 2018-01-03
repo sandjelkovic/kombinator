@@ -3,6 +3,8 @@ package com.sandjelkovic.kombinator.web
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.test.InvalidTestDataException
+import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,8 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 /**
@@ -23,6 +27,7 @@ import java.util.*
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
+@Transactional
 class CombinationsControllerTest : ControllerTest() {
 
     @Autowired
@@ -45,7 +50,7 @@ class CombinationsControllerTest : ControllerTest() {
         val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/${combination.uuid!!}")
+                get("/combinations/${combination.uuid!!}")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -57,7 +62,7 @@ class CombinationsControllerTest : ControllerTest() {
     @Test
     fun getCombinationNotFound() {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/${UUID.randomUUID()}")
+                get("/combinations/${UUID.randomUUID()}")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound)
     }
@@ -65,7 +70,7 @@ class CombinationsControllerTest : ControllerTest() {
     @Test
     fun getCombinationInvalidRequestPath() {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/invalidUUid")
+                get("/combinations/invalidUUid")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest)
     }
@@ -73,7 +78,7 @@ class CombinationsControllerTest : ControllerTest() {
     @Test
     fun getCombinationEmptyRequestPath() {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations/%20")
+                get("/combinations/%20")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest)
     }
@@ -81,7 +86,7 @@ class CombinationsControllerTest : ControllerTest() {
     @Test
     fun getCombinations() {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations")
+                get("/combinations")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -95,12 +100,29 @@ class CombinationsControllerTest : ControllerTest() {
     @Test
     fun getCombinationsEmpty() {
         combinationRepository.deleteAll()
-        val contentAsString = mockMvc.perform(
-                MockMvcRequestBuilders.get("/combinations")
+        mockMvc.perform(
+                get("/combinations")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isEmpty)
+    }
+
+    @Test
+    fun createCombination() {
+        combinationRepository.deleteAll()
+
+        val response = mockMvc.perform(
+                post("/combinations")
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isCreated)
+                .andExpect(
+                        header().string("location",
+                                equalTo("/combinations/${combinationRepository.findAll().first().uuid!!}")))
+                .andReturn().response
+
+        assertThat(response.contentLengthLong).isZero()
+        assertThat(response.contentAsString).isNullOrEmpty()
     }
 
 }

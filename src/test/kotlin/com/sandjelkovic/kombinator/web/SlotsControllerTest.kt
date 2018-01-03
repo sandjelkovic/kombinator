@@ -69,19 +69,20 @@ class SlotsControllerTest : ControllerTest() {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$._embedded").doesNotExist())
+                .andExpect(jsonPath("$").isEmpty)
     }
 
     @Test
     fun getSlotsNotExistingCombination() {
-
         val uuid = UUID.randomUUID()
 
         mockMvc.perform(
-                get("/combinations/${uuid}/slots")
+                get("/combinations/$uuid/slots")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$._embedded").doesNotExist())
+                .andExpect(jsonPath("$").isEmpty)
     }
 
 }
