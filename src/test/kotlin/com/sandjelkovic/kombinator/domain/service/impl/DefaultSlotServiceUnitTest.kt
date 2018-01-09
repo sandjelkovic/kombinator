@@ -28,8 +28,8 @@ class DefaultSlotServiceUnitTest {
     fun setUp() {
         repositoryMock = Mockito.mock(SlotRepository::class.java)
 
-        Mockito.`when`(repositoryMock.findByCombinationUuid(existingCombination.uuid!!)).thenReturn(
-                listOf(
+        Mockito.`when`(repositoryMock.findByCombinationUuid(existingCombination.uuid!!))
+                .thenReturn(listOf(
                         Slot(name = "GPU", combination = existingCombination, position = 2),
                         Slot(name = "CPU", combination = existingCombination, position = 1)
                 ))

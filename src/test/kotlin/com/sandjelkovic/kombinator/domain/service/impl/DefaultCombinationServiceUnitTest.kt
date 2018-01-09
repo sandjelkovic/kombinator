@@ -3,9 +3,8 @@ package com.sandjelkovic.kombinator.domain.service.impl
 import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import org.assertj.core.api.Assertions
-import org.hamcrest.Matchers.*
-import org.junit.Assert.assertThat
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -43,13 +42,16 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         val optional = service.getCombinationByInternalId(existingId)
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(true))
-        assertThat(optional.get().id, notNullValue())
-        assertThat(optional.get().id, equalTo(existingId))
-        assertThat(optional.get(), equalTo(existingCombination))
 
-        verify(repositoryMock, times(1)).findById(existingId)
+        assertThat(optional)
+                .isNotNull
+                .isPresent
+        assertThat(optional.get().id)
+                .isNotNull()
+                .isEqualTo(existingId)
+        assertThat(optional.get()).isEqualTo(existingCombination)
+
+        verify(repositoryMock).findById(existingId)
 
     }
 
@@ -58,10 +60,12 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         val optional = service.getCombinationByInternalId(invalidId)
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(false))
 
-        verify(repositoryMock, times(1)).findById(invalidId)
+        assertThat(optional)
+                .isNotNull
+                .isNotPresent
+
+        verify(repositoryMock).findById(invalidId)
     }
 
     @Test
@@ -69,8 +73,10 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         val optional = service.getCombinationByInternalId(negativeId)
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(false))
+
+        assertThat(optional)
+                .isNotNull
+                .isNotPresent
 
         verify(repositoryMock, never()).findById(any())
 
@@ -86,10 +92,12 @@ class DefaultCombinationServiceUnitTest {
                 .thenReturn(mockedCombinations)
 
         val allCombinations = service.findAllCombinations()
-        assertThat(allCombinations, notNullValue())
-        assertThat(allCombinations, not(empty()))
-        assertThat(allCombinations, hasSize(5))
-        assertThat(allCombinations, containsInAnyOrder(*mockedCombinations.toTypedArray()))
+
+        assertThat(allCombinations)
+                .isNotNull
+                .isNotEmpty
+                .hasSize(5)
+                .contains(*mockedCombinations.toTypedArray())
     }
 
     @Test
@@ -100,8 +108,10 @@ class DefaultCombinationServiceUnitTest {
                 .thenReturn(emptyList())
 
         val allCombinations = service.findAllCombinations()
-        assertThat(allCombinations, notNullValue())
-        assertThat(allCombinations, empty())
+
+        assertThat(allCombinations)
+                .isNotNull
+                .isEmpty()
     }
 
     @Test
@@ -114,24 +124,29 @@ class DefaultCombinationServiceUnitTest {
 
         val optional = service.findByUUID(uuid)
 
-        assertThat(optional.isPresent, equalTo(true))
-        assertThat(optional.get().uuid, equalTo(uuid))
-        assertThat(optional.get().name, equalTo("Name"))
+        assertThat(optional).isPresent
+        assertThat(optional.get().uuid).isEqualTo(uuid)
+        assertThat(optional.get().name).isEqualTo("Name")
+
         verify(repositoryMock).findByUuid(uuid)
     }
 
-    @Test(expected = InvalidUUIDException::class)
+    @Test
     fun findByUUIDEmptyUUID() {
         val service = DefaultCombinationService(repositoryMock)
 
-        val optional = service.findByUUID("")
+        val throwable = catchThrowable { service.findByUUID("") }
+
+        assertThat(throwable).isInstanceOf(InvalidUUIDException::class.java)
     }
 
-    @Test(expected = InvalidUUIDException::class)
+    @Test
     fun findByUUIDInvalidUUID() {
         val service = DefaultCombinationService(repositoryMock)
 
-        val optional = service.findByUUID("12ASD")
+        val throwable = catchThrowable { service.findByUUID("12ASD") }
+
+        assertThat(throwable).isInstanceOf(InvalidUUIDException::class.java)
     }
 
     @Test
@@ -143,7 +158,9 @@ class DefaultCombinationServiceUnitTest {
                 .thenReturn(Optional.empty())
 
         val optional = service.findByUUID(uuid.toString())
-        assertThat(optional.isPresent, equalTo(false))
+
+        assertThat(optional).isNotPresent
+
         verify(repositoryMock).findByUuid(uuid.toString())
     }
 
@@ -157,7 +174,7 @@ class DefaultCombinationServiceUnitTest {
 
         val savedCombination = service.createCombination(preparedCombination)
 
-        Assertions.assertThat(savedCombination.name).isEqualTo(preparedCombination.name)
+        assertThat(savedCombination.name).isEqualTo(preparedCombination.name)
         verify(repositoryMock).save(any<Combination>())
     }
 
@@ -167,9 +184,9 @@ class DefaultCombinationServiceUnitTest {
 
         val combinationWithID = Combination(id = 1, name = "Super combination")
 
-        val throwable = Assertions.catchThrowable { service.createCombination(combinationWithID) }
+        val throwable = catchThrowable { service.createCombination(combinationWithID) }
 
-        Assertions.assertThat(throwable).isInstanceOf(ValidationException::class.java)
+        assertThat(throwable).isInstanceOf(ValidationException::class.java)
         verify(repositoryMock, never()).save(any<Combination>())
     }
 
@@ -179,9 +196,9 @@ class DefaultCombinationServiceUnitTest {
 
         val combinationWithID = Combination(uuid = UUID.randomUUID().toString(), name = "Super combination")
 
-        val throwable = Assertions.catchThrowable { service.createCombination(combinationWithID) }
+        val throwable = catchThrowable { service.createCombination(combinationWithID) }
 
-        Assertions.assertThat(throwable).isInstanceOf(ValidationException::class.java)
+        assertThat(throwable).isInstanceOf(ValidationException::class.java)
         verify(repositoryMock, never()).save(any<Combination>())
     }
 }

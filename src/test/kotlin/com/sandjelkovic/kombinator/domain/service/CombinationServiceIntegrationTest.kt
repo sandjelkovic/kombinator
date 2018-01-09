@@ -2,10 +2,8 @@ package com.sandjelkovic.kombinator.domain.service
 
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import org.assertj.core.api.Assertions
-import org.hamcrest.Matchers.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
-import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,23 +51,27 @@ class CombinationServiceIntegrationTest {
 
         val optional = service.getCombinationByInternalId(savedCombination.id!!)
 
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(true))
+        assertThat(optional)
+                .isNotNull
+                .isPresent
 
         // Hibernate and it's proxies...
         val retrievedCombination = optional.get().copy()
 
-        assertThat(retrievedCombination.uuid, notNullValue())
-        assertThat(retrievedCombination.uuid, equalTo(uuid))
-        assertThat(retrievedCombination, samePropertyValuesAs(savedCombination))
+        assertThat(retrievedCombination.uuid)
+                .isNotNull()
+                .isEqualTo(uuid)
+
+        assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
     }
 
     @Test
     fun getByInternalIdNonExisting() {
         val optional = service.getCombinationByInternalId(invalidId)
 
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(false))
+        assertThat(optional)
+                .isNotNull
+                .isNotPresent
     }
 
     @Test
@@ -82,14 +84,15 @@ class CombinationServiceIntegrationTest {
 
         val combinations = service.findAllCombinations()
 
-        assertThat(combinations, notNullValue())
-        assertThat(combinations, not(empty()))
-        assertThat(combinations, hasSize(savedCombinations.size))
+        assertThat(combinations)
+                .isNotNull
+                .isNotEmpty
+                .hasSize(savedCombinations.size)
 
         val retrievedIds = combinations.map { it.id }
         val savedIdsArray = savedCombinations.map { it.id }.toTypedArray()
 
-        assertThat(retrievedIds, containsInAnyOrder(*savedIdsArray))
+        assertThat(retrievedIds).contains(*savedIdsArray)
     }
 
     @Test
@@ -99,23 +102,28 @@ class CombinationServiceIntegrationTest {
 
         val optional = service.findByUUID(uuid.toString())
 
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(true))
+        assertThat(optional)
+                .isNotNull
+                .isPresent
 
         // Hibernate and it's proxies...
         val retrievedCombination = optional.get().copy()
 
-        assertThat(retrievedCombination.uuid, notNullValue())
-        assertThat(retrievedCombination.uuid, equalTo(uuid))
-        assertThat(retrievedCombination, samePropertyValuesAs(savedCombination))
+        assertThat(retrievedCombination.uuid)
+                .isNotNull()
+                .isEqualTo(uuid)
+
+        assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
     }
 
     @Test
     fun findByUUIDNonExisting() {
         val optional = service.findByUUID(UUID.randomUUID().toString())
 
-        assertThat(optional, notNullValue())
-        assertThat(optional.isPresent, equalTo(false))
+
+        assertThat(optional)
+                .isNotNull
+                .isNotPresent
     }
 
 
@@ -126,10 +134,10 @@ class CombinationServiceIntegrationTest {
 
         val savedCombination = service.createCombination(Combination(name = "Super name")).copy()
 
-        Assertions.assertThat(savedCombination).isNotNull()
-        Assertions.assertThat(savedCombination.name).isEqualTo("Super name")
-        Assertions.assertThat(savedCombination.id).isGreaterThan(0)
-        Assertions.assertThat(savedCombination.uuid).isNotBlank()
+        assertThat(savedCombination).isNotNull()
+        assertThat(savedCombination.name).isEqualTo("Super name")
+        assertThat(savedCombination.id).isGreaterThan(0)
+        assertThat(savedCombination.uuid).isNotBlank()
     }
 
     fun refreshJPAContext() {
