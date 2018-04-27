@@ -1,5 +1,7 @@
 package com.sandjelkovic.kombinator.web
 
+import assertk.assert
+import assertk.assertions.isNullOrEmpty
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
@@ -79,10 +81,22 @@ class SlotsControllerTest : ControllerTest() {
         mockMvc.perform(
                 get("/combinations/$uuid/slots")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$._embedded").doesNotExist())
-                .andExpect(jsonPath("$").isEmpty)
+                .andExpect(status().isNotFound)
+                .andExpect { assert { it.response.contentAsString }.returnedValue { isNullOrEmpty() } }
     }
 
+    @Test
+    fun `should createSlots and bind it to the Combination`() {
+
+    }
+//
+//    @Test
+//    fun `should return 404 for non existing Combination`() {
+//        val uuid = UUID.randomUUID()
+//
+//        mockMvc.perform(
+//                post("/combinations/$uuid")
+//                        .accept(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isNotFound)
+//    }
 }

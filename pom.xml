@@ -87,6 +87,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.willowtreeapps.assertk/assertk -->
+		<dependency>
+			<groupId>com.willowtreeapps.assertk</groupId>
+			<artifactId>assertk</artifactId>
+			<version>0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nhaarman</groupId>
+			<artifactId>mockito-kotlin</artifactId>
+			<version>1.5.0</version>
+		</dependency>
+
 		<!--<dependency>-->
 		<!--<groupId>org.jetbrains.kotlin</groupId>-->
 		<!--<artifactId>kotlin-test</artifactId>-->
