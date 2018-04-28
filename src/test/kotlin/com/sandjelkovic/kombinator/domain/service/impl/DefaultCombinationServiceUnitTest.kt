@@ -1,6 +1,6 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
+import assertk.assertions.isFalse
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +16,7 @@ import javax.validation.ValidationException
  * @date 11.11.17.
  */
 class DefaultCombinationServiceUnitTest {
-    lateinit var repositoryMock : CombinationRepository
+    lateinit var repositoryMock: CombinationRepository
 
     private val invalidId = 100000L
     private val existingId = 555L
@@ -135,18 +135,18 @@ class DefaultCombinationServiceUnitTest {
     fun findByUUIDEmptyUUID() {
         val service = DefaultCombinationService(repositoryMock)
 
-        val throwable = catchThrowable { service.findByUUID("") }
-
-        assertThat(throwable).isInstanceOf(InvalidUUIDException::class.java)
+        assertk.assert { service.findByUUID("") }.returnedValue {
+            assertk.assert(actual.isPresent).isFalse()
+        }
     }
 
     @Test
     fun findByUUIDInvalidUUID() {
         val service = DefaultCombinationService(repositoryMock)
 
-        val throwable = catchThrowable { service.findByUUID("12ASD") }
-
-        assertThat(throwable).isInstanceOf(InvalidUUIDException::class.java)
+        assertk.assert { service.findByUUID("12ASD") }.returnedValue {
+            assertk.assert(actual.isPresent).isFalse()
+        }
     }
 
     @Test

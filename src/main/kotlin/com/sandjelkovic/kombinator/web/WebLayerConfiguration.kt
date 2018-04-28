@@ -14,4 +14,6 @@ import org.springframework.hateoas.mvc.ResourceProcessorInvoker
 class WebLayerConfiguration {
     @Bean fun noOpResourceProcessor() = NoOpResourceProcessor()
     @Bean fun resourceProcessorInvoker(processors: List<ResourceProcessor<*>>) = ResourceProcessorInvoker(processors)
+    @Bean
+    fun uuidValidator() = UUIDValidator()
 }

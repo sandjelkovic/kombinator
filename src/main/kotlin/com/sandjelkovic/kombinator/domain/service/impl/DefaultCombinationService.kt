@@ -1,10 +1,8 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.service.CombinationService
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.validation.ValidationException
 
@@ -15,8 +13,6 @@ import javax.validation.ValidationException
 class DefaultCombinationService(
         private val combinationRepository: CombinationRepository) : CombinationService {
     override fun findByUUID(uuid: String): Optional<Combination> {
-        validateUUID(uuid)
-
         return combinationRepository.findByUuid(uuid);
     }
 
@@ -35,17 +31,5 @@ class DefaultCombinationService(
         }
         val newUUID = UUID.randomUUID().toString()
         return combinationRepository.save(combination.copy(uuid = newUUID))
-    }
-
-    private fun validateUUID(uuid: String) {
-        try {
-            assert(uuid.isNotEmpty())
-            assert(uuid.isNotBlank())
-            UUID.fromString(uuid)
-        } catch (error: AssertionError) {
-            throw InvalidUUIDException()
-        } catch (illegalArgument: IllegalArgumentException) {
-            throw InvalidUUIDException()
-        }
     }
 }

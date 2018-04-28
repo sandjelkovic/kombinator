@@ -20,11 +20,13 @@ import javax.validation.ValidationException
 @RequestMapping("/combinations")
 class CombinationsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker,
-        val combinationService: CombinationService) {
+        val combinationService: CombinationService,
+        val uuidValidator: UUIDValidator) {
 
     @GetMapping("/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> {
         return try {
+            uuidValidator.validate(uuid)
             combinationService.findByUUID(uuid)
                     .map { ResponseEntity.ok(resourceProcessorInvoker.invokeProcessorsFor(it.toResource())) }
                     .orElseGet { ResponseEntity.notFound().build() }

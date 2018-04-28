@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.lang.IllegalArgumentException
-import java.util.*
 
 /**
  * @author sandjelkovic
@@ -23,12 +21,13 @@ import java.util.*
 class SlotsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker,
         val slotService: SlotService,
-        val combinationService: CombinationService
+        val combinationService: CombinationService,
+        val uuidValidator: UUIDValidator
 ) {
     @GetMapping
     fun getSlots(@PathVariable uuid: String): ResponseEntity<Resources<Slot>> {
         return try {
-            validateUUID(uuid)
+            uuidValidator.validate(uuid)
             combinationService.findByUUID(uuid)
                     .map { slotService.getSlotsByCombination(it.uuid!!) }
                     .map { Resources(it) }
@@ -44,16 +43,4 @@ class SlotsController(
 //    fun addSlots(@RequestBody slots: List<Slot>) {
 //
 //    }
-
-    private fun validateUUID(uuid: String) {
-        try {
-            assert(uuid.isNotEmpty())
-            assert(uuid.isNotBlank())
-            UUID.fromString(uuid)
-        } catch (error: AssertionError) {
-            throw InvalidUUIDException()
-        } catch (illegalArgument: IllegalArgumentException) {
-            throw InvalidUUIDException()
-        }
-    }
 }
