@@ -17,5 +17,6 @@ class DomainConfiguration {
     fun defaultCombinationService(combinationRepository: CombinationRepository) = DefaultCombinationService(combinationRepository)
 
     @Bean
-    fun defaultSlotService(slotRepository: SlotRepository) = DefaultSlotService(slotRepository)
+    fun defaultSlotService(slotRepository: SlotRepository, combinationRepository: CombinationRepository) =
+            DefaultSlotService(slotRepository, combinationRepository)
 }

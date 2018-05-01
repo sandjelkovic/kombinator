@@ -1,11 +1,15 @@
 package com.sandjelkovic.kombinator.web
 
 import assertk.assert
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNullOrEmpty
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
+import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
 import com.sandjelkovic.kombinator.test.InvalidTestDataException
+import org.hamcrest.Matchers.startsWith
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +20,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 /**
@@ -26,9 +32,13 @@ import java.util.*
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
+@Transactional
 class SlotsControllerTest : ControllerTest() {
     @Autowired
     lateinit var mockMvc: MockMvc
+
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
 
     @Autowired
     lateinit var combinationRepository: CombinationRepository
@@ -82,21 +92,41 @@ class SlotsControllerTest : ControllerTest() {
                 get("/combinations/$uuid/slots")
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound)
-                .andExpect { assert { it.response.contentAsString }.returnedValue { isNullOrEmpty() } }
+                .andExpect {
+                    assert { it.response.contentAsString }.returnedValue {
+                        isNullOrEmpty()
+                    }
+                }
     }
 
     @Test
-    fun `should createSlots and bind it to the Combination`() {
+    fun `should create a Slot with no entries and bind it to the Combination`() {
+        val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
+        val slot = Slot(name = "Test Slot", position = 10)
+        val allSlots = slotRepository.findAll().toList()
 
+        mockMvc.perform(
+                post("/combinations/${combination.uuid}/slots")
+                        .content(objectMapper.writeValueAsString(slot))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isCreated)
+                .andExpect(header().string("location",
+                        startsWith("/combinations/${combination.uuid!!}/slots/")))
+
+        assert { slotRepository.count() }.returnedValue {
+            isEqualTo(allSlots.size.toLong() + 1)
+        }
     }
-//
-//    @Test
-//    fun `should return 404 for non existing Combination`() {
-//        val uuid = UUID.randomUUID()
-//
-//        mockMvc.perform(
-//                post("/combinations/$uuid")
-//                        .accept(MediaType.APPLICATION_JSON_UTF8))
-//                .andExpect(status().isNotFound)
-//    }
+
+    @Test
+    fun `should return 404 for non existing Combination`() {
+        val slot = Slot(name = "Test Slot", position = 10)
+        mockMvc.perform(
+                post("/combinations/${UUID.randomUUID()}/slots")
+                        .content(objectMapper.writeValueAsString(slot))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound)
+    }
 }

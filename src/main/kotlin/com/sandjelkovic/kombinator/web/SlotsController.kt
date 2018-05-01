@@ -7,10 +7,10 @@ import com.sandjelkovic.kombinator.domain.service.SlotService
 import org.springframework.hateoas.Resources
 import org.springframework.hateoas.mvc.ResourceProcessorInvoker
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.net.URI
+import javax.validation.Valid
+import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -37,10 +37,19 @@ class SlotsController(
             ResponseEntity.badRequest().build()
         }
     }
-//
-//    @PostMapping
-//    @PutMapping
-//    fun addSlots(@RequestBody slots: List<Slot>) {
-//
-//    }
+
+    @PostMapping
+    @PutMapping
+    fun addSlots(@Valid @RequestBody slot: Slot, @PathVariable uuid: String): ResponseEntity<Void> {
+        return try {
+            uuidValidator.validate(uuid)
+            combinationService.findByUUID(uuid)
+                    .map { slot.combination = it }
+                    .map { slotService.save(slot) }
+                    .map { ResponseEntity.created(URI.create("/combinations/${it.combination?.uuid}/slots/${it.id}")).build<Void>() }
+                    .orElseGet { ResponseEntity.notFound().build() }
+        } catch (error: ValidationException) {
+            ResponseEntity.badRequest().build<Void>()
+        }
+    }
 }

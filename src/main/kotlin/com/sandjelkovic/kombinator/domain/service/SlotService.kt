@@ -8,4 +8,5 @@ import com.sandjelkovic.kombinator.domain.model.Slot
  */
 interface SlotService {
     fun getSlotsByCombination(combinationUUID: String): List<Slot>
+    fun save(slot: Slot): Slot
 }
