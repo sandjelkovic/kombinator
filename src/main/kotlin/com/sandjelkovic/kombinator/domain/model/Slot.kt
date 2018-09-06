@@ -1,5 +1,7 @@
 package com.sandjelkovic.kombinator.domain.model
 
+import arrow.core.Option
+import arrow.core.toOption
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.math.BigDecimal
 import javax.persistence.*
@@ -13,7 +15,7 @@ data class Slot(
         @Id @GeneratedValue
         var id: Long = 0,
         var name: String = "",
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "slot", orphanRemoval = true, cascade = arrayOf(CascadeType.ALL))
+        @OneToMany(fetch = FetchType.LAZY, mappedBy = "slot", orphanRemoval = true, cascade = [CascadeType.ALL])
         @JsonIgnore // TODO move to links or DTO
         var entries: List<SlotEntry> = listOf(),
         var position: Int = 0,
@@ -22,9 +24,8 @@ data class Slot(
         var combination: Combination? = null,
         @Version @JsonIgnore
         var version: Long = 0) {
-    fun value(): BigDecimal = entries.stream()
-            .filter { it.selected }
-            .findAny()
-            .map { it.value }
-            .orElse(BigDecimal.ZERO)
+    val value: Option<BigDecimal>
+        get() = entries
+                .firstOrNull { it.selected }.toOption()
+                .map { it.value }
 }
