@@ -1,5 +1,6 @@
 package com.sandjelkovic.kombinator.web
 
+import arrow.core.getOrElse
 import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.service.CombinationService
@@ -32,7 +33,7 @@ class SlotsController(
                     .map { slotService.getSlotsByCombination(it.uuid!!) }
                     .map { Resources(it) }
                     .map { ResponseEntity.ok().body(resourceProcessorInvoker.invokeProcessorsFor(it)) }
-                    .orElseGet { ResponseEntity.notFound().build() }
+                    .getOrElse { ResponseEntity.notFound().build() }
         } catch (error: InvalidUUIDException) {
             ResponseEntity.badRequest().build()
         }
@@ -47,7 +48,7 @@ class SlotsController(
                     .map { slot.combination = it }
                     .map { slotService.save(slot) }
                     .map { ResponseEntity.created(URI.create("/combinations/${it.combination?.uuid}/slots/${it.id}")).build<Void>() }
-                    .orElseGet { ResponseEntity.notFound().build() }
+                    .getOrElse { ResponseEntity.notFound().build() }
         } catch (error: ValidationException) {
             ResponseEntity.badRequest().build<Void>()
         }

@@ -1,15 +1,15 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import assertk.assertions.isFalse
+import arrow.core.Either
+import assertk.assertions.isTrue
+import com.sandjelkovic.kombinator.domain.exception.ValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
 import java.util.*
-import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -43,9 +43,8 @@ class DefaultCombinationServiceUnitTest {
 
         val optional = service.getCombinationByInternalId(existingId)
 
-        assertThat(optional)
-                .isNotNull
-                .isPresent
+        assertThat(optional).isNotNull
+        assertThat(optional.isDefined()).isTrue()
         assertThat(optional.get().id)
                 .isNotNull()
                 .isEqualTo(existingId)
@@ -61,9 +60,8 @@ class DefaultCombinationServiceUnitTest {
 
         val optional = service.getCombinationByInternalId(invalidId)
 
-        assertThat(optional)
-                .isNotNull
-                .isNotPresent
+        assertThat(optional).isNotNull
+        assertThat(optional.isEmpty()).isTrue()
 
         verify(repositoryMock).findById(invalidId)
     }
@@ -76,7 +74,7 @@ class DefaultCombinationServiceUnitTest {
 
         assertThat(optional)
                 .isNotNull
-                .isNotPresent
+        assertThat(optional.isEmpty()).isTrue()
 
         verify(repositoryMock, never()).findById(any())
 
@@ -122,11 +120,11 @@ class DefaultCombinationServiceUnitTest {
         `when`(repositoryMock.findByUuid(uuid))
                 .thenReturn(Optional.of(Combination(uuid = uuid, name = "Name")))
 
-        val optional = service.findByUUID(uuid)
+        val option = service.findByUUID(uuid)
 
-        assertThat(optional).isPresent
-        assertThat(optional.get().uuid).isEqualTo(uuid)
-        assertThat(optional.get().name).isEqualTo("Name")
+        assertThat(option.isDefined()).isTrue()
+        assertThat(option.get().uuid).isEqualTo(uuid)
+        assertThat(option.get().name).isEqualTo("Name")
 
         verify(repositoryMock).findByUuid(uuid)
     }
@@ -136,7 +134,7 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         assertk.assert { service.findByUUID("") }.returnedValue {
-            assertk.assert(actual.isPresent).isFalse()
+            assertk.assert(actual.isEmpty()).isTrue()
         }
     }
 
@@ -145,7 +143,7 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         assertk.assert { service.findByUUID("12ASD") }.returnedValue {
-            assertk.assert(actual.isPresent).isFalse()
+            assertk.assert(actual.isEmpty()).isTrue()
         }
     }
 
@@ -157,9 +155,9 @@ class DefaultCombinationServiceUnitTest {
         `when`(repositoryMock.findByUuid(uuid.toString()))
                 .thenReturn(Optional.empty())
 
-        val optional = service.findByUUID(uuid.toString())
+        val option = service.findByUUID(uuid.toString())
 
-        assertThat(optional).isNotPresent
+        assertThat(option.isEmpty()).isTrue()
 
         verify(repositoryMock).findByUuid(uuid.toString())
     }
@@ -172,9 +170,11 @@ class DefaultCombinationServiceUnitTest {
 
         val preparedCombination = Combination(name = "Super combination")
 
-        val savedCombination = service.createCombination(preparedCombination)
+        val either = service.createCombination(preparedCombination)
 
-        assertThat(savedCombination.name).isEqualTo(preparedCombination.name)
+        assertThat(either is Either.Right).isTrue()
+        val eitherRight = either as Either.Right
+        assertThat(eitherRight.b.name).isEqualTo(preparedCombination.name)
         verify(repositoryMock).save(any<Combination>())
     }
 
@@ -184,9 +184,11 @@ class DefaultCombinationServiceUnitTest {
 
         val combinationWithID = Combination(id = 1, name = "Super combination")
 
-        val throwable = catchThrowable { service.createCombination(combinationWithID) }
+        val either = service.createCombination(combinationWithID)
 
-        assertThat(throwable).isInstanceOf(ValidationException::class.java)
+        assertThat(either is Either.Left).isTrue()
+        val leftEither = either as Either.Left
+        assertThat(leftEither.a).isInstanceOf(ValidationException::class.java)
         verify(repositoryMock, never()).save(any<Combination>())
     }
 
@@ -196,9 +198,11 @@ class DefaultCombinationServiceUnitTest {
 
         val combinationWithID = Combination(uuid = UUID.randomUUID().toString(), name = "Super combination")
 
-        val throwable = catchThrowable { service.createCombination(combinationWithID) }
+        val either = service.createCombination(combinationWithID)
 
-        assertThat(throwable).isInstanceOf(ValidationException::class.java)
+        assertThat(either is Either.Left).isTrue()
+        val leftEither = either as Either.Left
+        assertThat(leftEither.a).isInstanceOf(ValidationException::class.java)
         verify(repositoryMock, never()).save(any<Combination>())
     }
 }

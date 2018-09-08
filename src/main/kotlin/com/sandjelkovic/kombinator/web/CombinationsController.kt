@@ -1,5 +1,6 @@
 package com.sandjelkovic.kombinator.web
 
+import arrow.core.getOrElse
 import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.service.CombinationService
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 import javax.validation.Valid
-import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -28,8 +28,10 @@ class CombinationsController(
         return try {
             uuidValidator.validate(uuid)
             combinationService.findByUUID(uuid)
-                    .map { ResponseEntity.ok(resourceProcessorInvoker.invokeProcessorsFor(it.toResource())) }
-                    .orElseGet { ResponseEntity.notFound().build() }
+                    .map { it.toResource() }
+                    .map { resourceProcessorInvoker.invokeProcessorsFor(it) }
+                    .map { ResponseEntity.ok(it) }
+                    .getOrElse { ResponseEntity.notFound().build() }
         } catch (error: InvalidUUIDException) {
             ResponseEntity.badRequest().build()
         }
@@ -43,12 +45,12 @@ class CombinationsController(
     }
 
     @PostMapping
-    fun createCombination(@Valid combination: Combination): ResponseEntity<Void> {
-        return try {
-            val created = combinationService.createCombination(combination)
-            ResponseEntity.created(URI.create("/combinations/${created.uuid}")).build()
-        } catch (exception: ValidationException) {
-            ResponseEntity.badRequest().build<Void>()
-        }
-    }
+    fun createCombination(@Valid combination: Combination): ResponseEntity<Void> =
+            combinationService.createCombination(combination)
+                    .map { URI.create("/combinations/${it.uuid}") }
+                    .fold(
+                            { ResponseEntity.badRequest().build<Void>() },
+                            { ResponseEntity.created(it).build() }
+                    )
+
 }

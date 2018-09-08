@@ -1,10 +1,15 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
+import arrow.core.Either
+import arrow.core.Option
+import arrow.core.filterOrElse
+import arrow.core.rightIfNotNull
+import com.sandjelkovic.flatMapToOption
+import com.sandjelkovic.kombinator.domain.exception.ValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.service.CombinationService
 import java.util.*
-import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -12,24 +17,23 @@ import javax.validation.ValidationException
  */
 class DefaultCombinationService(
         private val combinationRepository: CombinationRepository) : CombinationService {
-    override fun findByUUID(uuid: String): Optional<Combination> {
-        return combinationRepository.findByUuid(uuid);
-    }
+    override fun findByUUID(uuid: String): Option<Combination> = combinationRepository.findByUuid(uuid).flatMapToOption()
 
-    override fun findAllCombinations(): List<Combination> {
-        return combinationRepository.findAll().toList()
-    }
+    override fun findAllCombinations(): List<Combination> = combinationRepository.findAll().toList()
 
-    override fun getCombinationByInternalId(id: Long): Optional<Combination> {
-        return if (id > 0) combinationRepository.findById(id)
-        else Optional.empty()
-    }
+    override fun getCombinationByInternalId(id: Long): Option<Combination> =
+            if (id > 0) combinationRepository.findById(id).flatMapToOption()
+            else Option.empty()
 
-    override fun createCombination(combination: Combination): Combination {
-        if (combination.id != null || combination.uuid != null) {
-            throw ValidationException("ID can't be set when creating")
-        }
-        val newUUID = UUID.randomUUID().toString()
-        return combinationRepository.save(combination.copy(uuid = newUUID))
-    }
+    override fun createCombination(combination: Combination): Either<ValidationException, Combination> =
+            combination.rightIfNotNull { ValidationException("Combination can't be null") }
+                    .filterOrElse({ it.id == null }, { ValidationException("ID can't be set on creation") })
+                    .filterOrElse({ it.uuid == null }, { ValidationException("UUID can't be set on creation") })
+//                    .map { combinationRepository.save(it.copy(uuid = UUID.randomUUID().toString())) }
+                    .map(uuidEnricher(::generateUUIDString))
+                    .map { combinationRepository.save(it) }
+
+
+    fun generateUUIDString() = UUID.randomUUID().toString()
+    fun uuidEnricher(uuidGenerator: () -> String) = { combination: Combination -> combination.copy(uuid = uuidGenerator()) }
 }

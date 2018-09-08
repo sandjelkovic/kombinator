@@ -1,5 +1,6 @@
 package com.sandjelkovic.kombinator.domain.service
 
+import arrow.core.Either
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -49,14 +50,13 @@ class CombinationServiceIntegrationTest {
         val uuid = UUID.randomUUID().toString()
         val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
 
-        val optional = service.getCombinationByInternalId(savedCombination.id!!)
+        val option = service.getCombinationByInternalId(savedCombination.id!!)
 
-        assertThat(optional)
-                .isNotNull
-                .isPresent
+        assertThat(option).isNotNull
+        assertThat(option.isDefined()).isTrue()
 
         // Hibernate and it's proxies...
-        val retrievedCombination = optional.get().copy()
+        val retrievedCombination = option.get().copy()
 
         assertThat(retrievedCombination.uuid)
                 .isNotNull()
@@ -67,11 +67,11 @@ class CombinationServiceIntegrationTest {
 
     @Test
     fun getByInternalIdNonExisting() {
-        val optional = service.getCombinationByInternalId(invalidId)
+        val option = service.getCombinationByInternalId(invalidId)
 
-        assertThat(optional)
-                .isNotNull
-                .isNotPresent
+        assertThat(option).isNotNull
+        assertThat(option.isEmpty()).isTrue()
+
     }
 
     @Test
@@ -100,14 +100,13 @@ class CombinationServiceIntegrationTest {
         val uuid = UUID.randomUUID().toString()
         val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
 
-        val optional = service.findByUUID(uuid.toString())
+        val option = service.findByUUID(uuid)
 
-        assertThat(optional)
-                .isNotNull
-                .isPresent
+        assertThat(option).isNotNull
+        assertThat(option.isDefined()).isTrue()
 
         // Hibernate and it's proxies...
-        val retrievedCombination = optional.get().copy()
+        val retrievedCombination = option.get().copy()
 
         assertThat(retrievedCombination.uuid)
                 .isNotNull()
@@ -118,12 +117,11 @@ class CombinationServiceIntegrationTest {
 
     @Test
     fun findByUUIDNonExisting() {
-        val optional = service.findByUUID(UUID.randomUUID().toString())
+        val option = service.findByUUID(UUID.randomUUID().toString())
 
+        assertThat(option).isNotNull
+        assertThat(option.isEmpty()).isTrue()
 
-        assertThat(optional)
-                .isNotNull
-                .isNotPresent
     }
 
 
@@ -132,12 +130,14 @@ class CombinationServiceIntegrationTest {
         val uuid = UUID.randomUUID().toString()
         combinationRepository.deleteAll()
 
-        val savedCombination = service.createCombination(Combination(name = "Super name")).copy()
+        val either = service.createCombination(Combination(name = "Super name"))
 
-        assertThat(savedCombination).isNotNull()
-        assertThat(savedCombination.name).isEqualTo("Super name")
-        assertThat(savedCombination.id).isGreaterThan(0)
-        assertThat(savedCombination.uuid).isNotBlank()
+        assertThat(either).isNotNull()
+        assertThat(either is Either.Right).isTrue()
+        val rightEither = either as Either.Right
+        assertThat(rightEither.b.name).isEqualTo("Super name")
+        assertThat(rightEither.b.id).isGreaterThan(0)
+        assertThat(rightEither.b.uuid).isNotBlank()
     }
 
     fun refreshJPAContext() {
