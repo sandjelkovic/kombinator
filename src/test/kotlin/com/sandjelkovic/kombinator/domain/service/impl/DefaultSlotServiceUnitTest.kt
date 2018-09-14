@@ -3,15 +3,14 @@ package com.sandjelkovic.kombinator.domain.service.impl
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.mock
 import com.sandjelkovic.kombinator.domain.exception.ReferenceDoesntExist
 import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
+import io.mockk.every
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -29,16 +28,16 @@ class DefaultSlotServiceUnitTest {
     private val slotWithCombination = Slot(name = "Slot name", combination = existingCombination)
     private val slotAfterSaving = slotWithCombination.copy(id = 5)
 
-    private val mockSlotRepository: SlotRepository = mock {
-        on { findByCombinationUuid(existingCombination.uuid!!) } doReturn listOf(
+    private val mockSlotRepository = mockk<SlotRepository>().also {
+        every { it.findByCombinationUuid(existingCombination.uuid!!) } returns listOf(
                 Slot(name = "GPU", combination = existingCombination, position = 2),
                 Slot(name = "CPU", combination = existingCombination, position = 1))
-        on { save(eq(slotWithCombination)) } doReturn slotAfterSaving
+        every { it.save(eq(slotWithCombination)) } returns slotAfterSaving
     }
 
-    private val mockCombinationRepository: CombinationRepository = mock {
-        on { findByUuid("") } doReturn Optional.empty()
-        on { findByUuid(existingCombination.uuid!!) } doReturn Optional.of(existingCombination)
+    private val mockCombinationRepository = mockk<CombinationRepository>().also {
+        every { it.findByUuid(eq("")) } returns Optional.empty()
+        every { it.findByUuid(eq(existingCombination.uuid!!)) } returns Optional.of(existingCombination)
     }
 
     private lateinit var slotService: DefaultSlotService

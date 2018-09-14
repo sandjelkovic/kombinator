@@ -3,6 +3,7 @@ buildscript {
         kotlinVersion = '1.2.61'
         springBootVersion = '2.0.4.RELEASE'
         arrowVersion = '0.7.3'
+        mockkkVersion = '1.8.7'
     }
     repositories {
         mavenCentral()
@@ -70,9 +71,9 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile('org.springframework.security:spring-security-test')
+    testImplementation ("io.mockk:mockk:${mockkkVersion}")
 
     compile('com.willowtreeapps.assertk:assertk:0.9')
-    compile('com.nhaarman:mockito-kotlin:1.5.0')
 
 //	DB
     runtime('com.h2database:h2')
