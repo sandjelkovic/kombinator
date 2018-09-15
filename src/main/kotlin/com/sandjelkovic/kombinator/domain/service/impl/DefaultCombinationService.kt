@@ -17,7 +17,8 @@ import java.util.*
  */
 class DefaultCombinationService(
         private val combinationRepository: CombinationRepository) : CombinationService {
-    override fun findByUUID(uuid: String): Option<Combination> = combinationRepository.findByUuid(uuid).flatMapToOption()
+    override fun findByUUID(uuid: String): Option<Combination> =
+            combinationRepository.findByUuid(uuid).flatMapToOption()
 
     override fun findAllCombinations(): List<Combination> = combinationRepository.findAll().toList()
 
@@ -29,11 +30,12 @@ class DefaultCombinationService(
             combination.rightIfNotNull { ValidationException("Combination can't be null") }
                     .filterOrElse({ it.id == null }, { ValidationException("ID can't be set on creation") })
                     .filterOrElse({ it.uuid == null }, { ValidationException("UUID can't be set on creation") })
-//                    .map { combinationRepository.save(it.copy(uuid = UUID.randomUUID().toString())) }
-                    .map(uuidEnricher(::generateUUIDString))
+                    .map(combinationUuidEnricher(::generateUUIDString))
                     .map { combinationRepository.save(it) }
 
+    private fun generateUUIDString() = UUID.randomUUID().toString()
+    private fun combinationUuidEnricher(uuidSupplier: () -> String) =
+            { combination: Combination -> combination.copy(uuid = uuidSupplier()) }
 
-    fun generateUUIDString() = UUID.randomUUID().toString()
-    fun uuidEnricher(uuidGenerator: () -> String) = { combination: Combination -> combination.copy(uuid = uuidGenerator()) }
+
 }
