@@ -1,8 +1,7 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import assertk.assertions.hasMessage
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
+import arrow.core.Either
+import assertk.fail
 import com.sandjelkovic.kombinator.domain.exception.ReferenceDoesntExist
 import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
 import com.sandjelkovic.kombinator.domain.model.Combination
@@ -62,24 +61,38 @@ class DefaultSlotServiceUnitTest {
 
     @Test
     fun `Should save the Slot`() {
-        assertk.assert { slotService.save(slotWithCombination) }.returnedValue {
-            isEqualTo(slotAfterSaving)
+        val either = slotService.save(slotWithCombination)
+        when (either) {
+            is Either.Left -> fail("There shouldn't be an exception")
+            is Either.Right -> {
+                assertThat(either.b).isEqualTo(slotAfterSaving)
+            }
         }
     }
 
     @Test
-    fun `Should throw validation exception if the connected Combination doesn't exist`() {
-        assertk.assert { slotService.save(Slot(name = "Slot name", combination = Combination())) }.thrownError {
-            isInstanceOf(ReferenceDoesntExist::class)
-            hasMessage("slot.combination")
+    fun `Should return validation exception if the connected Combination doesn't exist`() {
+        val either = slotService.save(Slot(name = "Slot name", combination = Combination()))
+
+        when (either) {
+            is Either.Right -> fail("No exception returned")
+            is Either.Left -> {
+                assert(either.a is ReferenceDoesntExist)
+                assert(either.a.message.equals("slot.combination"))
+            }
         }
     }
 
     @Test
-    fun `Should throw validation exception if there is no Combination object connected to the Slot`() {
-        assertk.assert { slotService.save(Slot(name = "Slot name")) }.thrownError {
-            isInstanceOf(RequiredParameterMissing::class)
-            hasMessage("slot.combination")
+    fun `Should return validation exception if there is no Combination object connected to the Slot`() {
+        val either = slotService.save(Slot(name = "Slot name"))
+
+        when (either) {
+            is Either.Right -> fail("No exception returned")
+            is Either.Left -> {
+                assert(either.a is RequiredParameterMissing)
+                assert(either.a.message.equals("slot.combination"))
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.sandjelkovic.kombinator.web
 
+import arrow.core.Either
+import arrow.core.Try
 import arrow.core.getOrElse
 import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Slot
@@ -11,7 +13,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 import javax.validation.Valid
-import javax.validation.ValidationException
 
 /**
  * @author sandjelkovic
@@ -23,8 +24,8 @@ class SlotsController(
         val resourceProcessorInvoker: ResourceProcessorInvoker,
         val slotService: SlotService,
         val combinationService: CombinationService,
-        val uuidValidator: UUIDValidator
-) {
+        val uuidValidator: UUIDValidator) {
+
     @GetMapping
     fun getSlots(@PathVariable uuid: String): ResponseEntity<Resources<Slot>> {
         return try {
@@ -42,15 +43,29 @@ class SlotsController(
     @PostMapping
     @PutMapping
     fun addSlots(@Valid @RequestBody slot: Slot, @PathVariable uuid: String): ResponseEntity<Void> {
-        return try {
-            uuidValidator.validate(uuid)
-            combinationService.findByUUID(uuid)
-                    .map { slot.combination = it }
-                    .map { slotService.save(slot) }
-                    .map { ResponseEntity.created(URI.create("/combinations/${it.combination?.uuid}/slots/${it.id}")).build<Void>() }
-                    .getOrElse { ResponseEntity.notFound().build() }
-        } catch (error: ValidationException) {
-            ResponseEntity.badRequest().build<Void>()
+        return Try { uuidValidator.validate(uuid) }
+                .fold(
+                        { ResponseEntity.badRequest().build<Void>() },
+                        { _ ->
+                            combinationService.findByUUID(uuid)
+                                    .map { combination -> slot.copy(combination = combination) }
+                                    .map { newSlot -> slotService.save(newSlot) }
+                                    .fold({ ResponseEntity.notFound().build<Void>() },
+                                            eitherToResponseEntityMapper(slotToResponseMapper()))
+                        })
+    }
+
+
+    fun <T> eitherToResponseEntityMapper(eitherMapper: (T) -> ResponseEntity<Void>)
+            : (Either<Exception, T>) -> ResponseEntity<Void> {
+        return { either -> either.fold({ ResponseEntity.badRequest().build<Void>() }, eitherMapper) }
+    }
+
+    fun slotToResponseMapper(): (Slot) -> ResponseEntity<Void> {
+        return { slot ->
+            ResponseEntity.created(mapToUri(slot)).build<Void>()
         }
     }
+
+    fun mapToUri(it: Slot) = URI.create("/combinations/${it.combination?.uuid}/slots/${it.id}")!!
 }

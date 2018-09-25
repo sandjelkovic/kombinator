@@ -1,7 +1,12 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
+import arrow.core.Either
+import arrow.core.filterOrElse
+import arrow.core.right
 import com.sandjelkovic.kombinator.domain.exception.ReferenceDoesntExist
 import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
+import com.sandjelkovic.kombinator.domain.exception.ValidationException
+import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
@@ -13,19 +18,18 @@ import com.sandjelkovic.kombinator.domain.service.SlotService
  */
 class DefaultSlotService(private val slotRepository: SlotRepository,
                          private val combinationRepository: CombinationRepository) : SlotService {
-    override fun save(slot: Slot): Slot {
-        if (slot.combination == null) {
-            throw RequiredParameterMissing("slot.combination")
-        }
-        if (!combinationRepository.findByUuid(slot.combination?.uuid ?: "").isPresent) {
-            throw ReferenceDoesntExist("slot.combination")
-        }
-        return slotRepository.save(slot)
-    }
+    override fun save(slot: Slot): Either<ValidationException, Slot> = slot.right()
+            .filterOrElse(
+                    { slot.combination != null }, { RequiredParameterMissing("slot.combination") })
+            .filterOrElse(
+                    { combinationExists(slot.combination) }, { ReferenceDoesntExist("slot.combination") })
+            .map { slotRepository.save(it) }
 
-    override fun getSlotsByCombination(combinationUUID: String): List<Slot> {
-        return slotRepository.findByCombinationUuid(combinationUUID)
-                .sortedBy { it.position }
-    }
+    override fun getSlotsByCombination(combinationUUID: String): List<Slot> =
+            slotRepository.findByCombinationUuid(combinationUUID)
+                    .sortedBy { it.position }
+
+    private fun combinationExists(combination: Combination?) =
+            combinationRepository.findByUuid(combination?.uuid ?: "").isPresent
 
 }

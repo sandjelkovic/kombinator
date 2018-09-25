@@ -101,7 +101,8 @@ class SlotsControllerTest : ControllerTest() {
 
     @Test
     fun `should create a Slot with no entries and bind it to the Combination`() {
-        val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
+        val combination = combinationRepository.findByName(super.fullCombinationName)
+                .orElseThrow { InvalidTestDataException() }
         val slot = Slot(name = "Test Slot", position = 10)
         val allSlots = slotRepository.findAll().toList()
 
