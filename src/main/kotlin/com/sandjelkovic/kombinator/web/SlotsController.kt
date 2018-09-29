@@ -56,15 +56,13 @@ class SlotsController(
     }
 
 
-    fun <T> eitherToResponseEntityMapper(eitherMapper: (T) -> ResponseEntity<Void>)
+    fun <T> eitherToResponseEntityMapper(rightMapper: (T) -> ResponseEntity<Void>)
             : (Either<Exception, T>) -> ResponseEntity<Void> {
-        return { either -> either.fold({ ResponseEntity.badRequest().build<Void>() }, eitherMapper) }
+        return { either -> either.fold({ ResponseEntity.badRequest().build<Void>() }, rightMapper) }
     }
 
     fun slotToResponseMapper(): (Slot) -> ResponseEntity<Void> {
-        return { slot ->
-            ResponseEntity.created(mapToUri(slot)).build<Void>()
-        }
+        return { slot -> ResponseEntity.created(mapToUri(slot)).build<Void>() }
     }
 
     fun mapToUri(it: Slot) = URI.create("/combinations/${it.combination?.uuid}/slots/${it.id}")!!
