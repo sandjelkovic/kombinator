@@ -1,7 +1,6 @@
 package com.sandjelkovic.kombinator.web
 
 import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
-import java.lang.IllegalArgumentException
 import java.util.*
 
 /**

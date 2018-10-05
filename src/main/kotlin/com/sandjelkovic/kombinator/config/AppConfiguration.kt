@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class AppConfiguration {
     @Bean
-    fun exampleDataRunner(combinationRepository: CombinationRepository,
-                          slotEntryRepository: SlotEntryRepository,
-                          slotRepository: SlotRepository) = ExampleDataRunner(combinationRepository, slotRepository, slotEntryRepository)
+    fun exampleDataRunner(
+        combinationRepository: CombinationRepository,
+        slotEntryRepository: SlotEntryRepository,
+        slotRepository: SlotRepository
+    ) = ExampleDataRunner(combinationRepository, slotRepository, slotEntryRepository)
 }

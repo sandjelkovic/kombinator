@@ -29,8 +29,9 @@ class DefaultSlotServiceUnitTest {
 
     private val mockSlotRepository = mockk<SlotRepository>().also {
         every { it.findByCombinationUuid(existingCombination.uuid!!) } returns listOf(
-                Slot(name = "GPU", combination = existingCombination, position = 2),
-                Slot(name = "CPU", combination = existingCombination, position = 1))
+			Slot(name = "GPU", combination = existingCombination, position = 2),
+			Slot(name = "CPU", combination = existingCombination, position = 1)
+		)
         every { it.save(eq(slotWithCombination)) } returns slotAfterSaving
     }
 
@@ -51,12 +52,12 @@ class DefaultSlotServiceUnitTest {
         val slots = slotService.getSlotsByCombination(existingCombination.uuid!!)
 
         assertThat(slots)
-                .isNotEmpty
-                .hasSize(2)
-                .allMatch { slot -> slot.combination!!.id == existingCombination.id }
-                .allMatch { slot -> slot.combination!!.uuid == existingCombination.uuid }
-                .allMatch { it.name == "CPU" || it.name == "GPU" }
-                .isSortedAccordingTo(comparing<Slot, Int> { it.position })
+			.isNotEmpty
+			.hasSize(2)
+			.allMatch { slot -> slot.combination!!.id == existingCombination.id }
+			.allMatch { slot -> slot.combination!!.uuid == existingCombination.uuid }
+			.allMatch { it.name == "CPU" || it.name == "GPU" }
+			.isSortedAccordingTo(comparing<Slot, Int> { it.position })
     }
 
     @Test

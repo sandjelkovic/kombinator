@@ -16,20 +16,22 @@ import com.sandjelkovic.kombinator.domain.service.SlotService
  * @author sandjelkovic
  * @date 30.12.17.
  */
-class DefaultSlotService(private val slotRepository: SlotRepository,
-                         private val combinationRepository: CombinationRepository) : SlotService {
+class DefaultSlotService(
+	private val slotRepository: SlotRepository,
+	private val combinationRepository: CombinationRepository
+) : SlotService {
     override fun save(slot: Slot): Either<ValidationException, Slot> = slot.right()
-            .filterOrElse(
-                    { slot.combination != null }, { RequiredParameterMissing("slot.combination") })
-            .filterOrElse(
-                    { combinationExists(slot.combination) }, { ReferenceDoesntExist("slot.combination") })
-            .map { slotRepository.save(it) }
+		.filterOrElse(
+			{ slot.combination != null }, { RequiredParameterMissing("slot.combination") })
+		.filterOrElse(
+			{ combinationExists(slot.combination) }, { ReferenceDoesntExist("slot.combination") })
+		.map { slotRepository.save(it) }
 
     override fun getSlotsByCombination(combinationUUID: String): List<Slot> =
-            slotRepository.findByCombinationUuid(combinationUUID)
-                    .sortedBy { it.position }
+		slotRepository.findByCombinationUuid(combinationUUID)
+			.sortedBy { it.position }
 
     private fun combinationExists(combination: Combination?) =
-            combinationRepository.findByUuid(combination?.uuid ?: "").isPresent
+		combinationRepository.findByUuid(combination?.uuid ?: "").isPresent
 
 }

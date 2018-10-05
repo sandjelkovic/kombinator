@@ -12,20 +12,21 @@ import javax.persistence.*
  */
 @Entity
 data class Slot(
-        @Id @GeneratedValue
-        var id: Long = 0,
-        var name: String = "",
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "slot", orphanRemoval = true, cascade = [CascadeType.ALL])
-        @JsonIgnore // TODO move to links or DTO
-        var entries: List<SlotEntry> = listOf(),
-        var position: Int = 0,
-        @ManyToOne
-        @JsonIgnore
-        var combination: Combination? = null,
-        @Version @JsonIgnore
-        var version: Long = 0) {
+	@Id @GeneratedValue
+	var id: Long = 0,
+	var name: String = "",
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "slot", orphanRemoval = true, cascade = [CascadeType.ALL])
+	@JsonIgnore // TODO move to links or DTO
+	var entries: List<SlotEntry> = listOf(),
+	var position: Int = 0,
+	@ManyToOne
+	@JsonIgnore
+	var combination: Combination? = null,
+	@Version @JsonIgnore
+	var version: Long = 0
+) {
     val value: Option<BigDecimal>
         get() = entries
-                .firstOrNull { it.selected }.toOption()
-                .map { it.value }
+			.firstOrNull { it.selected }.toOption()
+			.map { it.value }
 }

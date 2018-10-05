@@ -57,31 +57,35 @@ class SlotsControllerTest : ControllerTest() {
 
     @Test
     fun getSlots() {
-        val combination = combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
+        val combination =
+            combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
-                get("/combinations/${combination.uuid}/slots")
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$._embedded").exists())
-                .andExpect(jsonPath("$._embedded.slotList").exists())
-                .andExpect(jsonPath("$._embedded.slotList").isArray)
-                .andExpect(jsonPath("$._embedded.slotList").isNotEmpty)
-                .andExpect(jsonPath("$..slotList.length()", jsonListSizeMatcher(2)))
+            get("/combinations/${combination.uuid}/slots")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(jsonPath("$._embedded").exists())
+            .andExpect(jsonPath("$._embedded.slotList").exists())
+            .andExpect(jsonPath("$._embedded.slotList").isArray)
+            .andExpect(jsonPath("$._embedded.slotList").isNotEmpty)
+            .andExpect(jsonPath("$..slotList.length()", jsonListSizeMatcher(2)))
     }
 
     @Test
     fun getSlotsEmpty() {
-        val combination = combinationRepository.findByName("Living room furniture").orElseThrow { InvalidTestDataException() }
+        val combination =
+            combinationRepository.findByName("Living room furniture").orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
-                get("/combinations/${combination.uuid}/slots")
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$._embedded").doesNotExist())
-                .andExpect(jsonPath("$").isEmpty)
+            get("/combinations/${combination.uuid}/slots")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$").isEmpty)
     }
 
     @Test
@@ -89,31 +93,37 @@ class SlotsControllerTest : ControllerTest() {
         val uuid = UUID.randomUUID()
 
         mockMvc.perform(
-                get("/combinations/$uuid/slots")
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isNotFound)
-                .andExpect {
-                    assert { it.response.contentAsString }.returnedValue {
-                        isNullOrEmpty()
-                    }
+            get("/combinations/$uuid/slots")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
+            .andExpect(status().isNotFound)
+            .andExpect {
+                assert { it.response.contentAsString }.returnedValue {
+                    isNullOrEmpty()
                 }
+            }
     }
 
     @Test
     fun `should create a Slot with no entries and bind it to the Combination`() {
         val combination = combinationRepository.findByName(super.fullCombinationName)
-                .orElseThrow { InvalidTestDataException() }
+            .orElseThrow { InvalidTestDataException() }
         val slot = Slot(name = "Test Slot", position = 10)
         val allSlots = slotRepository.findAll().toList()
 
         mockMvc.perform(
-                post("/combinations/${combination.uuid}/slots")
-                        .content(objectMapper.writeValueAsString(slot))
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isCreated)
-                .andExpect(header().string("location",
-                        startsWith("/combinations/${combination.uuid!!}/slots/")))
+            post("/combinations/${combination.uuid}/slots")
+                .content(objectMapper.writeValueAsString(slot))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
+            .andExpect(status().isCreated)
+            .andExpect(
+                header().string(
+                    "location",
+                    startsWith("/combinations/${combination.uuid!!}/slots/")
+                )
+            )
 
         assert { slotRepository.count() }.returnedValue {
             isEqualTo(allSlots.size.toLong() + 1)
@@ -124,10 +134,11 @@ class SlotsControllerTest : ControllerTest() {
     fun `should return 404 for non existing Combination`() {
         val slot = Slot(name = "Test Slot", position = 10)
         mockMvc.perform(
-                post("/combinations/${UUID.randomUUID()}/slots")
-                        .content(objectMapper.writeValueAsString(slot))
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isNotFound)
+            post("/combinations/${UUID.randomUUID()}/slots")
+                .content(objectMapper.writeValueAsString(slot))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+        )
+            .andExpect(status().isNotFound)
     }
 }

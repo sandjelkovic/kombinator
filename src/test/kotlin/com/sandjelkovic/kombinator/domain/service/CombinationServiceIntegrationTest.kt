@@ -59,8 +59,8 @@ class CombinationServiceIntegrationTest {
         val retrievedCombination = option.get().copy()
 
         assertThat(retrievedCombination.uuid)
-                .isNotNull()
-                .isEqualTo(uuid)
+            .isNotNull()
+            .isEqualTo(uuid)
 
         assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
     }
@@ -77,17 +77,17 @@ class CombinationServiceIntegrationTest {
     @Test
     fun findAllCombinations() {
         val savedCombinations = (100..105)
-                .map { Combination(id = it.toLong()) }
-                .map { combinationRepository.save(it) }
+            .map { Combination(id = it.toLong()) }
+            .map { combinationRepository.save(it) }
 
         refreshJPAContext()
 
         val combinations = service.findAllCombinations()
 
         assertThat(combinations)
-                .isNotNull
-                .isNotEmpty
-                .hasSize(savedCombinations.size)
+            .isNotNull
+            .isNotEmpty
+            .hasSize(savedCombinations.size)
 
         val retrievedIds = combinations.map { it.id }
         val savedIdsArray = savedCombinations.map { it.id }.toTypedArray()
@@ -109,8 +109,8 @@ class CombinationServiceIntegrationTest {
         val retrievedCombination = option.get().copy()
 
         assertThat(retrievedCombination.uuid)
-                .isNotNull()
-                .isEqualTo(uuid)
+            .isNotNull()
+            .isEqualTo(uuid)
 
         assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
     }
@@ -127,7 +127,6 @@ class CombinationServiceIntegrationTest {
 
     @Test
     fun shouldCreateCombination() {
-        val uuid = UUID.randomUUID().toString()
         combinationRepository.deleteAll()
 
         val either = service.createCombination(Combination(name = "Super name"))

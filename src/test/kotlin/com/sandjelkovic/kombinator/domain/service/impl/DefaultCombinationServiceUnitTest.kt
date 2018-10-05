@@ -29,11 +29,11 @@ class DefaultCombinationServiceUnitTest {
         repositoryMock = mock(CombinationRepository::class.java)
 
         `when`(repositoryMock.findById(existingId))
-                .thenReturn(Optional.of(existingCombination))
+            .thenReturn(Optional.of(existingCombination))
         `when`(repositoryMock.findById(invalidId))
-                .thenReturn(Optional.empty())
+            .thenReturn(Optional.empty())
         `when`(repositoryMock.findById(negativeId))
-                .thenReturn(Optional.empty())
+            .thenReturn(Optional.empty())
     }
 
 
@@ -46,8 +46,8 @@ class DefaultCombinationServiceUnitTest {
         assertThat(optional).isNotNull
         assertThat(optional.isDefined()).isTrue()
         assertThat(optional.get().id)
-                .isNotNull()
-                .isEqualTo(existingId)
+            .isNotNull()
+            .isEqualTo(existingId)
         assertThat(optional.get()).isEqualTo(existingCombination)
 
         verify(repositoryMock).findById(existingId)
@@ -73,7 +73,7 @@ class DefaultCombinationServiceUnitTest {
         val optional = service.getCombinationByInternalId(negativeId)
 
         assertThat(optional)
-                .isNotNull
+            .isNotNull
         assertThat(optional.isEmpty()).isTrue()
 
         verify(repositoryMock, never()).findById(any())
@@ -84,18 +84,18 @@ class DefaultCombinationServiceUnitTest {
     fun findAllCombinations() {
         val service = DefaultCombinationService(repositoryMock)
         val mockedCombinations = (1..5)
-                .map { Combination(id = it.toLong()) }
+            .map { Combination(id = it.toLong()) }
 
         `when`(repositoryMock.findAll())
-                .thenReturn(mockedCombinations)
+            .thenReturn(mockedCombinations)
 
         val allCombinations = service.findAllCombinations()
 
         assertThat(allCombinations)
-                .isNotNull
-                .isNotEmpty
-                .hasSize(5)
-                .contains(*mockedCombinations.toTypedArray())
+            .isNotNull
+            .isNotEmpty
+            .hasSize(5)
+            .contains(*mockedCombinations.toTypedArray())
     }
 
     @Test
@@ -103,13 +103,13 @@ class DefaultCombinationServiceUnitTest {
         val service = DefaultCombinationService(repositoryMock)
 
         `when`(repositoryMock.findAll())
-                .thenReturn(emptyList())
+            .thenReturn(emptyList())
 
         val allCombinations = service.findAllCombinations()
 
         assertThat(allCombinations)
-                .isNotNull
-                .isEmpty()
+            .isNotNull
+            .isEmpty()
     }
 
     @Test
@@ -118,7 +118,7 @@ class DefaultCombinationServiceUnitTest {
         val uuid = UUID.randomUUID().toString()
 
         `when`(repositoryMock.findByUuid(uuid))
-                .thenReturn(Optional.of(Combination(uuid = uuid, name = "Name")))
+            .thenReturn(Optional.of(Combination(uuid = uuid, name = "Name")))
 
         val option = service.findByUUID(uuid)
 
@@ -153,7 +153,7 @@ class DefaultCombinationServiceUnitTest {
         val uuid = UUID.randomUUID()
 
         `when`(repositoryMock.findByUuid(uuid.toString()))
-                .thenReturn(Optional.empty())
+            .thenReturn(Optional.empty())
 
         val option = service.findByUUID(uuid.toString())
 
@@ -166,7 +166,7 @@ class DefaultCombinationServiceUnitTest {
     fun shouldCreateCombination() {
         val service = DefaultCombinationService(repositoryMock)
         `when`(repositoryMock.save(any<Combination>()))
-                .thenReturn(Combination(id = 11, uuid = UUID.randomUUID().toString(), name = "Super combination"))
+            .thenReturn(Combination(id = 11, uuid = UUID.randomUUID().toString(), name = "Super combination"))
 
         val preparedCombination = Combination(name = "Super combination")
 

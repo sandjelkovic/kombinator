@@ -11,7 +11,7 @@ import com.sandjelkovic.kombinator.domain.model.Combination
  */
 interface CombinationService {
     fun getCombinationByInternalId(id: Long): Option<Combination>
-    fun findAllCombinations() : List<Combination>
+	fun findAllCombinations(): List<Combination>
     fun findByUUID(uuid: String): Option<Combination>
     fun createCombination(combination: Combination): Either<ValidationException, Combination>
 }

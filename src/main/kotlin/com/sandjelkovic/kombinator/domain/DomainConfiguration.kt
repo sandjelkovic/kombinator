@@ -14,9 +14,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class DomainConfiguration {
     @Bean
-    fun defaultCombinationService(combinationRepository: CombinationRepository) = DefaultCombinationService(combinationRepository)
+	fun defaultCombinationService(combinationRepository: CombinationRepository) =
+		DefaultCombinationService(combinationRepository)
 
     @Bean
     fun defaultSlotService(slotRepository: SlotRepository, combinationRepository: CombinationRepository) =
-            DefaultSlotService(slotRepository, combinationRepository)
+		DefaultSlotService(slotRepository, combinationRepository)
 }

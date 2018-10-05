@@ -11,17 +11,17 @@ import javax.validation.constraints.NotBlank
  */
 @Entity
 data class Combination(
-        @Id @GeneratedValue
-        var id: Long? = null,
-        @Column(unique = true)
-        var uuid: String? = null,
-        @Version
-        var version: Long = 0,
-        @NotBlank
-        var name: String = "",
-        @Enumerated(value = EnumType.STRING)
-        var visibility: Visibility = Visibility.PRIVATE,
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "combination", orphanRemoval = true)
-        @JsonIgnore // TODO move to links or DTO
-        var slots: List<Slot> = listOf()
+	@Id @GeneratedValue
+	var id: Long? = null,
+	@Column(unique = true)
+	var uuid: String? = null,
+	@Version
+	var version: Long = 0,
+	@NotBlank
+	var name: String = "",
+	@Enumerated(value = EnumType.STRING)
+	var visibility: Visibility = Visibility.PRIVATE,
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "combination", orphanRemoval = true)
+	@JsonIgnore // TODO move to links or DTO
+	var slots: List<Slot> = listOf()
 )

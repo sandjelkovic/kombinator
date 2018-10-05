@@ -8,7 +8,7 @@ import java.util.*
  * @author sandjelkovic
  * @date 9.11.17.
  */
-interface CombinationRepository : CrudRepository<Combination, Long>{
+interface CombinationRepository : CrudRepository<Combination, Long> {
     fun findByName(name: String): Optional<Combination>
     fun findByUuid(uuid: String): Optional<Combination>
 }
