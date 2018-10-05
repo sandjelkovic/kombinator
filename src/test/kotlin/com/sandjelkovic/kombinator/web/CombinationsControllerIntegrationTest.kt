@@ -28,7 +28,7 @@ import java.util.*
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @Transactional
-class CombinationsControllerTest : ControllerTest() {
+class CombinationsControllerIntegrationTest : ControllerTest() {
 
     @Autowired
     lateinit var mockMvc: MockMvc
