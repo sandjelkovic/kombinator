@@ -3,7 +3,8 @@ buildscript {
         kotlinVersion = '1.2.70'
         springBootVersion = '2.0.4.RELEASE'
         arrowVersion = '0.7.3'
-        mockkkVersion = '1.8.7'
+        mockkVersion = '1.8.7'
+        striktVersion = '0.15.1'
     }
     repositories {
         mavenCentral()
@@ -39,6 +40,7 @@ compileTestKotlin {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 
@@ -71,7 +73,8 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile('org.springframework.security:spring-security-test')
-    testImplementation ("io.mockk:mockk:${mockkkVersion}")
+    testCompile("io.strikt:strikt-core:${striktVersion}")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
 
     compile('com.willowtreeapps.assertk:assertk:0.9')
 
