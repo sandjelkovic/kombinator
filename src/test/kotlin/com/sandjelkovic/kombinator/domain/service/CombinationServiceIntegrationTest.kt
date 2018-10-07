@@ -1,9 +1,11 @@
 package com.sandjelkovic.kombinator.domain.service
 
-import arrow.core.Either
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import org.assertj.core.api.Assertions.assertThat
+import com.sandjelkovic.kombinator.test.isDefined
+import com.sandjelkovic.kombinator.test.isEmpty
+import com.sandjelkovic.kombinator.test.isNotBlank
+import com.sandjelkovic.kombinator.test.isRight
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.transaction.annotation.Transactional
+import strikt.api.expectThat
+import strikt.assertions.*
 import java.util.*
 import javax.persistence.EntityManager
 
@@ -47,31 +51,23 @@ class CombinationServiceIntegrationTest {
 
     @Test
     fun getByInternalIdSuccess() {
-        val uuid = UUID.randomUUID().toString()
-        val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
+        val randomUUID = UUID.randomUUID().toString()
+        val savedCombination = combinationRepository.save(Combination(uuid = randomUUID)).copy()
 
         val option = service.getCombinationByInternalId(savedCombination.id!!)
 
-        assertThat(option).isNotNull
-        assertThat(option.isDefined()).isTrue()
-
-        // Hibernate and it's proxies...
-        val retrievedCombination = option.get().copy()
-
-        assertThat(retrievedCombination.uuid)
-            .isNotNull()
-            .isEqualTo(uuid)
-
-        assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
+        expectThat(option).isDefined {
+            get { uuid }.isNotNull().isEqualTo(randomUUID)
+            // Hibernate and it's proxies...
+            get { copy() }.propertiesAreEqualTo(savedCombination)
+        }
     }
 
     @Test
     fun getByInternalIdNonExisting() {
         val option = service.getCombinationByInternalId(invalidId)
 
-        assertThat(option).isNotNull
-        assertThat(option.isEmpty()).isTrue()
-
+        expectThat(option).isEmpty()
     }
 
     @Test
@@ -84,44 +80,35 @@ class CombinationServiceIntegrationTest {
 
         val combinations = service.findAllCombinations()
 
-        assertThat(combinations)
-            .isNotNull
-            .isNotEmpty
+        expectThat(combinations)
+            .isNotEmpty()
             .hasSize(savedCombinations.size)
 
-        val retrievedIds = combinations.map { it.id }
-        val savedIdsArray = savedCombinations.map { it.id }.toTypedArray()
+        val retrievedIds = combinations.map { it.id!! }
+        val savedIds = savedCombinations.map { it.id!! }
 
-        assertThat(retrievedIds).contains(*savedIdsArray)
+        expectThat(retrievedIds).containsExactly(savedIds)
     }
 
     @Test
     fun findByUUIDSuccess() {
-        val uuid = UUID.randomUUID().toString()
-        val savedCombination = combinationRepository.save(Combination(uuid = uuid)).copy()
+        val randomUUID = UUID.randomUUID().toString()
+        val savedCombination = combinationRepository.save(Combination(uuid = randomUUID)).copy()
 
-        val option = service.findByUUID(uuid)
+        val option = service.findByUUID(randomUUID)
 
-        assertThat(option).isNotNull
-        assertThat(option.isDefined()).isTrue()
-
-        // Hibernate and it's proxies...
-        val retrievedCombination = option.get().copy()
-
-        assertThat(retrievedCombination.uuid)
-            .isNotNull()
-            .isEqualTo(uuid)
-
-        assertThat(retrievedCombination).isEqualToComparingFieldByFieldRecursively(savedCombination)
+        expectThat(option).isDefined {
+            get { uuid }.isNotNull().isEqualTo(randomUUID)
+            // Hibernate and it's proxies...
+            get { copy() }.propertiesAreEqualTo(savedCombination)
+        }
     }
 
     @Test
     fun findByUUIDNonExisting() {
         val option = service.findByUUID(UUID.randomUUID().toString())
 
-        assertThat(option).isNotNull
-        assertThat(option.isEmpty()).isTrue()
-
+        expectThat(option).isEmpty()
     }
 
 
@@ -131,12 +118,20 @@ class CombinationServiceIntegrationTest {
 
         val either = service.createCombination(Combination(name = "Super name"))
 
-        assertThat(either).isNotNull()
-        assertThat(either is Either.Right).isTrue()
-        val rightEither = either as Either.Right
-        assertThat(rightEither.b.name).isEqualTo("Super name")
-        assertThat(rightEither.b.id).isGreaterThan(0)
-        assertThat(rightEither.b.uuid).isNotBlank()
+        // Strikt
+        expectThat(either).isRight {
+            get { name }.isEqualTo("Super name")
+            get { id }.isNotNull().isGreaterThan(0L)
+            get { uuid }.isNotNull().isNotBlank()
+        }
+
+        // AssertJ
+//        assertThat(either).isNotNull()
+//        assertThat(either is Either.Right).isTrue()
+//        val rightEither = either as Either.Right
+//        assertThat(rightEither.b.name).isEqualTo("Super name")
+//        assertThat(rightEither.b.id).isGreaterThan(0)
+//        assertThat(rightEither.b.uuid).isNotBlank()
     }
 
     fun refreshJPAContext() {
