@@ -4,7 +4,7 @@ buildscript {
         springBootVersion = '2.0.4.RELEASE'
         arrowVersion = '0.7.3'
         mockkVersion = '1.8.7'
-        striktVersion = '0.15.1'
+        striktVersion = '0.15.2'
     }
     repositories {
         mavenCentral()

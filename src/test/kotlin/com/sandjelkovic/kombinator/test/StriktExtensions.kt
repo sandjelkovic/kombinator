@@ -11,10 +11,6 @@ import strikt.assertions.isA
  * @date 2018-10-05
  */
 
-fun Assertion.Builder<String>.isNotEmpty(): Assertion.Builder<String> = assertThat("Value is empty") { it.isNotEmpty() }
-
-fun Assertion.Builder<String>.isNotBlank(): Assertion.Builder<String> = assertThat("Value is blank") { it.isNotBlank() }
-
 // Arrow
 fun <T> Assertion.Builder<Option<T>>.isDefined(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =
     assertThat("Value is present") { it.isDefined() }

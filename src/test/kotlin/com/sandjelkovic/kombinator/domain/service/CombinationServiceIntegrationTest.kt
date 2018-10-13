@@ -4,7 +4,6 @@ import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.test.isDefined
 import com.sandjelkovic.kombinator.test.isEmpty
-import com.sandjelkovic.kombinator.test.isNotBlank
 import com.sandjelkovic.kombinator.test.isRight
 import org.junit.After
 import org.junit.Before
@@ -35,7 +34,9 @@ class CombinationServiceIntegrationTest {
     @Autowired
     lateinit var entityManager: EntityManager
 
-    private val invalidId = 100000L
+    companion object {
+        private const val invalidId = 100000L
+    }
 
     @Before
     fun before() {
@@ -124,14 +125,6 @@ class CombinationServiceIntegrationTest {
             get { id }.isNotNull().isGreaterThan(0L)
             get { uuid }.isNotNull().isNotBlank()
         }
-
-        // AssertJ
-//        assertThat(either).isNotNull()
-//        assertThat(either is Either.Right).isTrue()
-//        val rightEither = either as Either.Right
-//        assertThat(rightEither.b.name).isEqualTo("Super name")
-//        assertThat(rightEither.b.id).isGreaterThan(0)
-//        assertThat(rightEither.b.uuid).isNotBlank()
     }
 
     fun refreshJPAContext() {
