@@ -13,13 +13,15 @@ import strikt.assertions.isA
 
 // Arrow
 fun <T> Assertion.Builder<Option<T>>.isDefined(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =
-    assertThat("Value is present") { it.isDefined() }
+    assertThat("Value is not present") { it.isDefined() }
         .isA<Some<T>>()
         .get { t }
         .and(valueAssertions)
 
 fun <T> Assertion.Builder<Option<T>>.isEmpty(): Assertion.Builder<Option<T>> =
-    assertThat("Value is empty") { it.isEmpty() }
+    assertThat("Value is present") { it.isEmpty() }
+
+fun <T> Assertion.Builder<Option<T>>.isNone(): Assertion.Builder<Option<T>> = isEmpty()
 
 fun <L, R> Assertion.Builder<Either<L, R>>.isRight(valueAssertions: Assertion.Builder<R>.() -> Unit = {}): Assertion.Builder<R> =
     assertThat("Either is Left instead of Right") { it.isRight() }
