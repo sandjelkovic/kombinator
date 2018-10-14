@@ -1,23 +1,22 @@
 package com.sandjelkovic.kombinator.web
 
-import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
+import arrow.core.*
+import arrow.data.Validated
+import arrow.typeclasses.binding
 import java.util.*
 
 /**
  * @author sandjelkovic
  * @date 15.4.18.
  */
+
 class UUIDValidator {
-    fun validate(target: String) {
-        try {
-            assert(target.isNotEmpty())
-            assert(target.isNotBlank())
-            UUID.fromString(target)
-        } catch (error: AssertionError) {
-            throw InvalidUUIDException()
-        } catch (illegalArgument: IllegalArgumentException) {
-            throw InvalidUUIDException()
-        }
-    }
+    fun validateUuid(target: String): Validated<ValidationException, UUID> = Validated.fromEither(
+        Either.monadError<ValidationException>().binding {
+            Right(target).filterOrElse({ it.isNotEmpty() }) { EmptyParameterException }.bind()
+            Right(target).filterOrElse({ it.isNotBlank() }) { EmptyParameterException }.bind()
+            Try { UUID.fromString(target) }.fold({ Left(InvalidUuidException) }, { Right(it!!) }).bind()
+        }.fix()
+    )
 }
 

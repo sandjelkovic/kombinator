@@ -1,7 +1,6 @@
 package com.sandjelkovic.kombinator.web
 
 import arrow.core.getOrElse
-import com.sandjelkovic.kombinator.domain.exception.InvalidUUIDException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.service.CombinationService
 import org.springframework.hateoas.Resource
@@ -19,23 +18,24 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/combinations")
 class CombinationsController(
-	val resourceProcessorInvoker: ResourceProcessorInvoker,
-	val combinationService: CombinationService,
-	val uuidValidator: UUIDValidator
+    val resourceProcessorInvoker: ResourceProcessorInvoker,
+    val combinationService: CombinationService,
+    val uuidValidator: UUIDValidator
 ) {
 
     @GetMapping("/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> {
-        return try {
-            uuidValidator.validate(uuid)
-            combinationService.findByUUID(uuid)
-				.map { it.toResource() }
-				.map { resourceProcessorInvoker.invokeProcessorsFor(it) }
-				.map { ResponseEntity.ok(it) }
-				.getOrElse { ResponseEntity.notFound().build() }
-        } catch (error: InvalidUUIDException) {
-            ResponseEntity.badRequest().build()
-        }
+        return uuidValidator.validateUuid(uuid)
+            .fold({ ResponseEntity.badRequest().build<Resource<Combination>>() },
+                { validUuid ->
+                    combinationService.findByUUID(validUuid.toString())
+                        .map { it.toResource() }
+                        .map { resourceProcessorInvoker.invokeProcessorsFor(it) }
+                        .map { ResponseEntity.ok(it) }
+                        .getOrElse { ResponseEntity.notFound().build() }
+                }
+            )
+
     }
 
     @GetMapping
@@ -47,11 +47,11 @@ class CombinationsController(
 
     @PostMapping
     fun createCombination(@Valid combination: Combination): ResponseEntity<Void> =
-		combinationService.createCombination(combination)
-			.map { URI.create("/combinations/${it.uuid}") }
-			.fold(
-				{ ResponseEntity.badRequest().build<Void>() },
-				{ ResponseEntity.created(it).build() }
-			)
+        combinationService.createCombination(combination)
+            .map { URI.create("/combinations/${it.uuid}") }
+            .fold(
+                { ResponseEntity.badRequest().build<Void>() },
+                { ResponseEntity.created(it).build() }
+            )
 
 }
