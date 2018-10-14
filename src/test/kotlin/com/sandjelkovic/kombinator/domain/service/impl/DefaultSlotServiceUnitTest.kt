@@ -8,11 +8,16 @@ import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
+import com.sandjelkovic.kombinator.test.isEqualToOneOf
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
 import org.junit.Test
+import strikt.api.expectThat
+import strikt.assertions.all
+import strikt.assertions.hasSize
+import strikt.assertions.isEqualTo
+import strikt.assertions.isNotEmpty
 import java.util.*
 import java.util.Comparator.comparing
 
@@ -40,24 +45,21 @@ class DefaultSlotServiceUnitTest {
         every { it.findByUuid(eq(existingCombination.uuid!!)) } returns Optional.of(existingCombination)
     }
 
-    private lateinit var slotService: DefaultSlotService
-
-    @Before
-    fun setUp() {
-        slotService = DefaultSlotService(mockSlotRepository, mockCombinationRepository)
-    }
+    private val slotService: DefaultSlotService = DefaultSlotService(mockSlotRepository, mockCombinationRepository)
 
     @Test
     fun `Should get the slots associated with Combination from UUID`() {
         val slots = slotService.getSlotsByCombination(existingCombination.uuid!!)
 
-        assertThat(slots)
-			.isNotEmpty
-			.hasSize(2)
-			.allMatch { slot -> slot.combination!!.id == existingCombination.id }
-			.allMatch { slot -> slot.combination!!.uuid == existingCombination.uuid }
-			.allMatch { it.name == "CPU" || it.name == "GPU" }
-			.isSortedAccordingTo(comparing<Slot, Int> { it.position })
+        expectThat(slots)
+            .isNotEmpty().hasSize(2)
+            .all {
+                get { combination!!.id }.isEqualTo(existingCombination.id)
+                get { combination!!.uuid }.isEqualTo(existingCombination.uuid)
+                get { name }.isEqualToOneOf(listOf("CPU", "GPU"))
+            }
+//      no replacement in Strikt for this yet
+        assertThat(slots).isSortedAccordingTo(comparing<Slot, Int> { it.position })
     }
 
     @Test

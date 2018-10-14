@@ -11,6 +11,9 @@ import strikt.assertions.isA
  * @date 2018-10-05
  */
 
+fun Assertion.Builder<String>.isEqualToOneOf(possibilities: Collection<String>): Assertion.Builder<String> =
+    assertThat("Value is not present") { actual -> possibilities.contains(actual) }
+
 // Arrow
 fun <T> Assertion.Builder<Option<T>>.isDefined(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =
     assertThat("Value is not present") { it.isDefined() }
