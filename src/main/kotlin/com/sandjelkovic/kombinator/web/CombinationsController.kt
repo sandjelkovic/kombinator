@@ -24,9 +24,10 @@ class CombinationsController(
 ) {
 
     @GetMapping("/{uuid}")
-    fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> {
-        return uuidValidator.validateUuid(uuid)
-            .fold({ ResponseEntity.badRequest().build<Resource<Combination>>() },
+    fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> =
+        uuidValidator.validateUuid(uuid)
+            .fold(
+                { ResponseEntity.badRequest().build<Resource<Combination>>() },
                 { validUuid ->
                     combinationService.findByUUID(validUuid.toString())
                         .map { it.toResource() }
@@ -36,14 +37,12 @@ class CombinationsController(
                 }
             )
 
-    }
-
     @GetMapping
-    fun getAllCombinations(): ResponseEntity<Resources<Combination>> {
-        val allCombinations = combinationService.findAllCombinations()
-        val resources = Resources(allCombinations)
-        return ResponseEntity.ok().body(resourceProcessorInvoker.invokeProcessorsFor(resources))
-    }
+    fun getAllCombinations(): ResponseEntity<Resources<Combination>> =
+        Resources(combinationService.findAllCombinations())
+            .let(resourceProcessorInvoker::invokeProcessorsFor)
+            .let(ResponseEntity.ok()::body)
+
 
     @PostMapping
     fun createCombination(@Valid combination: Combination): ResponseEntity<Void> =
