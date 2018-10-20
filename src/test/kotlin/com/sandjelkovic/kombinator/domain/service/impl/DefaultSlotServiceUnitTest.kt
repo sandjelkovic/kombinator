@@ -1,7 +1,7 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import com.sandjelkovic.kombinator.domain.exception.ReferenceNotFound
-import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException.ReferenceNotFound
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException.RequiredParameterMissing
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
