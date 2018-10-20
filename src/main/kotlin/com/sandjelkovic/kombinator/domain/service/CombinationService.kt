@@ -2,7 +2,7 @@ package com.sandjelkovic.kombinator.domain.service
 
 import arrow.core.Either
 import arrow.core.Option
-import com.sandjelkovic.kombinator.domain.exception.ValidationException
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 
 /**
@@ -13,5 +13,5 @@ interface CombinationService {
     fun getCombinationByInternalId(id: Long): Option<Combination>
 	fun findAllCombinations(): List<Combination>
     fun findByUUID(uuid: String): Option<Combination>
-    fun createCombination(combination: Combination): Either<ValidationException, Combination>
+    fun createCombination(combination: Combination): Either<DomainValidationException, Combination>
 }

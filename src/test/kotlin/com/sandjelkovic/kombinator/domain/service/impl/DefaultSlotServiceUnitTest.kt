@@ -1,6 +1,6 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import com.sandjelkovic.kombinator.domain.exception.ReferenceDoesntExist
+import com.sandjelkovic.kombinator.domain.exception.ReferenceNotFound
 import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.model.Slot
@@ -73,7 +73,7 @@ class DefaultSlotServiceUnitTest {
         val either = slotService.save(Slot(name = "Slot name", combination = Combination()))
 
         expectThat(either).isLeft {
-            isA<ReferenceDoesntExist>()
+            isA<ReferenceNotFound>()
             get { message }.isEqualTo("slot.combination")
         }
     }

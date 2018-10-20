@@ -1,7 +1,7 @@
 package com.sandjelkovic.kombinator.domain.service
 
 import arrow.core.Either
-import com.sandjelkovic.kombinator.domain.exception.ValidationException
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException
 import com.sandjelkovic.kombinator.domain.model.Slot
 
 /**
@@ -10,5 +10,5 @@ import com.sandjelkovic.kombinator.domain.model.Slot
  */
 interface SlotService {
     fun getSlotsByCombination(combinationUUID: String): List<Slot>
-    fun save(slot: Slot): Either<ValidationException, Slot>
+    fun save(slot: Slot): Either<DomainValidationException, Slot>
 }

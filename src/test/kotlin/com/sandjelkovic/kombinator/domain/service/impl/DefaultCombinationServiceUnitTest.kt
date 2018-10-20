@@ -1,6 +1,6 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import com.sandjelkovic.kombinator.domain.exception.ValidationException
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.test.*
@@ -162,7 +162,7 @@ class DefaultCombinationServiceUnitTest {
         val either = service.createCombination(combinationWithID)
 
         expectThat(either).isLeft {
-            isA<ValidationException>()
+            isA<DomainValidationException>()
         }
 
         verify(exactly = 0) { repositoryMock.save(any<Combination>()) }
@@ -175,7 +175,7 @@ class DefaultCombinationServiceUnitTest {
         val either = service.createCombination(combinationWithID)
 
         expectThat(either).isLeft {
-            isA<ValidationException>()
+            isA<DomainValidationException>()
         }
 
         verify(exactly = 0) { repositoryMock.save(any<Combination>()) }

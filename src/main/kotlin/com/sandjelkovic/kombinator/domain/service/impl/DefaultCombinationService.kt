@@ -5,7 +5,7 @@ import arrow.core.Option
 import arrow.core.filterOrElse
 import arrow.core.rightIfNotNull
 import com.sandjelkovic.flatMapToOption
-import com.sandjelkovic.kombinator.domain.exception.ValidationException
+import com.sandjelkovic.kombinator.domain.exception.DomainValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.service.CombinationService
@@ -27,10 +27,10 @@ class DefaultCombinationService(
 		if (id > 0) combinationRepository.findById(id).flatMapToOption()
 		else Option.empty()
 
-    override fun createCombination(combination: Combination): Either<ValidationException, Combination> =
-		combination.rightIfNotNull { ValidationException("Combination can't be null") }
-			.filterOrElse({ it.id == null }, { ValidationException("ID can't be set on creation") })
-			.filterOrElse({ it.uuid == null }, { ValidationException("UUID can't be set on creation") })
+	override fun createCombination(combination: Combination): Either<DomainValidationException, Combination> =
+		combination.rightIfNotNull { DomainValidationException("Combination can't be null") }
+			.filterOrElse({ it.id == null }, { DomainValidationException("ID can't be set on creation") })
+			.filterOrElse({ it.uuid == null }, { DomainValidationException("UUID can't be set on creation") })
 			.map(combinationUuidEnricher(::generateUUIDString))
 			.map { combinationRepository.save(it) }
 
