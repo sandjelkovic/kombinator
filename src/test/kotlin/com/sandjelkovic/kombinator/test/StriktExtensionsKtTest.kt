@@ -1,5 +1,7 @@
 package com.sandjelkovic.kombinator.test
 
+import arrow.core.Left
+import arrow.core.Right
 import org.junit.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
@@ -28,6 +30,22 @@ class StriktExtensionsKtTest {
         val innerValueComparator = Comparator.comparing<WrapperClass<Int>, Int> { it.innerValue }
 
         expectThrows<AssertionError> { expectThat(list.reversed()).isSortedAccordingTo(innerValueComparator) }
+    }
+
+    @Test
+    fun `Should detect that Either is Right`() {
+        val right = Right(5)
+
+        expectThat(right).isRight()
+        expectThrows<AssertionError> { expectThat(right).isLeft() }
+    }
+
+    @Test
+    fun `Should detect that Either is Left`() {
+        val left = Left(5)
+
+        expectThat(left).isLeft()
+        expectThrows<AssertionError> { expectThat(left).isRight() }
     }
 
     class WrapperClass<T>(val innerValue: T)
