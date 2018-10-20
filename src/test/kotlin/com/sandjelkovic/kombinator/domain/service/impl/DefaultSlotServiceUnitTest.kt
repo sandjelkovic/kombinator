@@ -1,7 +1,5 @@
 package com.sandjelkovic.kombinator.domain.service.impl
 
-import arrow.core.Either
-import assertk.fail
 import com.sandjelkovic.kombinator.domain.exception.ReferenceDoesntExist
 import com.sandjelkovic.kombinator.domain.exception.RequiredParameterMissing
 import com.sandjelkovic.kombinator.domain.model.Combination
@@ -9,15 +7,14 @@ import com.sandjelkovic.kombinator.domain.model.Slot
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
 import com.sandjelkovic.kombinator.domain.repository.SlotRepository
 import com.sandjelkovic.kombinator.test.isEqualToOneOf
+import com.sandjelkovic.kombinator.test.isLeft
+import com.sandjelkovic.kombinator.test.isRight
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import strikt.api.expectThat
-import strikt.assertions.all
-import strikt.assertions.hasSize
-import strikt.assertions.isEqualTo
-import strikt.assertions.isNotEmpty
+import strikt.assertions.*
 import java.util.*
 import java.util.Comparator.comparing
 
@@ -65,11 +62,9 @@ class DefaultSlotServiceUnitTest {
     @Test
     fun `Should save the Slot`() {
         val either = slotService.save(slotWithCombination)
-        when (either) {
-            is Either.Left -> fail("There shouldn't be an exception")
-            is Either.Right -> {
-                assertThat(either.b).isEqualTo(slotAfterSaving)
-            }
+
+        expectThat(either).isRight {
+            isEqualTo(slotAfterSaving)
         }
     }
 
@@ -77,12 +72,9 @@ class DefaultSlotServiceUnitTest {
     fun `Should return validation exception if the connected Combination doesn't exist`() {
         val either = slotService.save(Slot(name = "Slot name", combination = Combination()))
 
-        when (either) {
-            is Either.Right -> fail("No exception returned")
-            is Either.Left -> {
-                assert(either.a is ReferenceDoesntExist)
-                assert(either.a.message.equals("slot.combination"))
-            }
+        expectThat(either).isLeft {
+            isA<ReferenceDoesntExist>()
+            get { message }.isEqualTo("slot.combination")
         }
     }
 
@@ -90,12 +82,9 @@ class DefaultSlotServiceUnitTest {
     fun `Should return validation exception if there is no Combination object connected to the Slot`() {
         val either = slotService.save(Slot(name = "Slot name"))
 
-        when (either) {
-            is Either.Right -> fail("No exception returned")
-            is Either.Left -> {
-                assert(either.a is RequiredParameterMissing)
-                assert(either.a.message.equals("slot.combination"))
-            }
+        expectThat(either).isLeft {
+            isA<RequiredParameterMissing>()
+            get { message }.isEqualTo("slot.combination")
         }
     }
 }

@@ -77,8 +77,6 @@ dependencies {
 //    testImplementation("io.strikt:strikt-java-time:${striktVersion}")
     testImplementation("io.mockk:mockk:${mockkVersion}")
 
-    compile('com.willowtreeapps.assertk:assertk:0.9')
-
 //	DB
     runtime('com.h2database:h2')
 }

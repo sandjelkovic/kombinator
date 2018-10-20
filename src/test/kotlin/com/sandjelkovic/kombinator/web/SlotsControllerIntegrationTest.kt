@@ -1,8 +1,5 @@
 package com.sandjelkovic.kombinator.web
 
-import assertk.assert
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNullOrEmpty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sandjelkovic.kombinator.config.ExampleDataRunner
 import com.sandjelkovic.kombinator.domain.model.Slot
@@ -23,6 +20,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.annotation.Transactional
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
+import strikt.assertions.isNullOrEmpty
 import java.util.*
 
 /**
@@ -56,9 +56,9 @@ class SlotsControllerIntegrationTest : ControllerTest() {
     }
 
     @Test
-    fun getSlots() {
-        val combination =
-            combinationRepository.findByName(super.fullCombinationName).orElseThrow { InvalidTestDataException() }
+    fun `Should get Slots`() {
+        val combination = combinationRepository.findByName(super.fullCombinationName)
+            .orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
             get("/combinations/${combination.uuid}/slots")
@@ -74,9 +74,9 @@ class SlotsControllerIntegrationTest : ControllerTest() {
     }
 
     @Test
-    fun getSlotsEmpty() {
-        val combination =
-            combinationRepository.findByName("Living room furniture").orElseThrow { InvalidTestDataException() }
+    fun `Should get 0 Slots`() {
+        val combination = combinationRepository.findByName("Living room furniture")
+            .orElseThrow { InvalidTestDataException() }
 
         mockMvc.perform(
             get("/combinations/${combination.uuid}/slots")
@@ -89,7 +89,7 @@ class SlotsControllerIntegrationTest : ControllerTest() {
     }
 
     @Test
-    fun getSlotsNotExistingCombination() {
+    fun `Should get Not Found for getting Slots of inexisting Combination`() {
         val uuid = UUID.randomUUID()
 
         mockMvc.perform(
@@ -98,14 +98,13 @@ class SlotsControllerIntegrationTest : ControllerTest() {
         )
             .andExpect(status().isNotFound)
             .andExpect {
-                assert { it.response.contentAsString }.returnedValue {
-                    isNullOrEmpty()
-                }
+                expectThat(it.response.contentAsString)
+                    .isNullOrEmpty()
             }
     }
 
     @Test
-    fun `should create a Slot with no entries and bind it to the Combination`() {
+    fun `Should create a Slot with no entries and bind it to the Combination`() {
         val combination = combinationRepository.findByName(super.fullCombinationName)
             .orElseThrow { InvalidTestDataException() }
         val slot = Slot(name = "Test Slot", position = 10)
@@ -125,13 +124,11 @@ class SlotsControllerIntegrationTest : ControllerTest() {
                 )
             )
 
-        assert { slotRepository.count() }.returnedValue {
-            isEqualTo(allSlots.size.toLong() + 1)
-        }
+        expectThat(slotRepository.count()).isEqualTo(allSlots.size + 1L)
     }
 
     @Test
-    fun `should return 404 for non existing Combination`() {
+    fun `Should return 404 for non existing Combination`() {
         val slot = Slot(name = "Test Slot", position = 10)
         mockMvc.perform(
             post("/combinations/${UUID.randomUUID()}/slots")
