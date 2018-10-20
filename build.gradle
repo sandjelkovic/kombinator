@@ -4,7 +4,7 @@ buildscript {
         springBootVersion = '2.0.4.RELEASE'
         arrowVersion = '0.7.3'
         mockkVersion = '1.8.7'
-        striktVersion = '0.15.2'
+        striktVersion = '0.16.2'
     }
     repositories {
         mavenCentral()
@@ -70,10 +70,11 @@ dependencies {
     compile("io.arrow-kt:arrow-generic:${arrowVersion}")
 
 //	Test
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
-    testCompile('org.springframework.security:spring-security-test')
-    testCompile("io.strikt:strikt-core:${striktVersion}")
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testImplementation('org.springframework.security:spring-security-test')
+    testImplementation("io.strikt:strikt-core:${striktVersion}")
+//    testImplementation("io.strikt:strikt-java-time:${striktVersion}")
     testImplementation("io.mockk:mockk:${mockkVersion}")
 
     compile('com.willowtreeapps.assertk:assertk:0.9')
