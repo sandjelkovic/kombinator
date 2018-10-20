@@ -3,8 +3,9 @@ package com.sandjelkovic.kombinator.test
 import arrow.core.Left
 import arrow.core.Right
 import org.junit.Test
+import strikt.api.catching
 import strikt.api.expectThat
-import strikt.api.expectThrows
+import strikt.assertions.isNotNull
 
 /**
  * @author sandjelkovic
@@ -19,8 +20,6 @@ class StriktExtensionsKtTest {
         val innerValueComparator = Comparator.comparing<WrapperClass<Int>, Int> { it.innerValue }
 
         expectThat(list).isSorted(innerValueComparator)
-
-        expectThrows<AssertionError> { expectThat(list.reversed()).isSorted(innerValueComparator) }
     }
 
     @Test
@@ -29,7 +28,7 @@ class StriktExtensionsKtTest {
 
         val innerValueComparator = Comparator.comparing<WrapperClass<Int>, Int> { it.innerValue }
 
-        expectThrows<AssertionError> { expectThat(list.reversed()).isSorted(innerValueComparator) }
+        expectThat(catching { expectThat(list.reversed()).isSorted(innerValueComparator) }).isNotNull()
     }
 
     @Test
@@ -37,7 +36,7 @@ class StriktExtensionsKtTest {
         val right = Right(5)
 
         expectThat(right).isRight()
-        expectThrows<AssertionError> { expectThat(right).isLeft() }
+        expectThat(catching { expectThat(right).isLeft() }).isNotNull()
     }
 
     @Test
@@ -45,7 +44,7 @@ class StriktExtensionsKtTest {
         val left = Left(5)
 
         expectThat(left).isLeft()
-        expectThrows<AssertionError> { expectThat(left).isRight() }
+        expectThat(catching { expectThat(left).isRight() }).isNotNull()
     }
 
     class WrapperClass<T>(val innerValue: T)
