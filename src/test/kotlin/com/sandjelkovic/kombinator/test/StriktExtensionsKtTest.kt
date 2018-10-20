@@ -18,9 +18,9 @@ class StriktExtensionsKtTest {
 
         val innerValueComparator = Comparator.comparing<WrapperClass<Int>, Int> { it.innerValue }
 
-        expectThat(list).isSortedAccordingTo(innerValueComparator)
+        expectThat(list).isSorted(innerValueComparator)
 
-        expectThrows<AssertionError> { expectThat(list.reversed()).isSortedAccordingTo(innerValueComparator) }
+        expectThrows<AssertionError> { expectThat(list.reversed()).isSorted(innerValueComparator) }
     }
 
     @Test
@@ -29,7 +29,7 @@ class StriktExtensionsKtTest {
 
         val innerValueComparator = Comparator.comparing<WrapperClass<Int>, Int> { it.innerValue }
 
-        expectThrows<AssertionError> { expectThat(list.reversed()).isSortedAccordingTo(innerValueComparator) }
+        expectThrows<AssertionError> { expectThat(list.reversed()).isSorted(innerValueComparator) }
     }
 
     @Test

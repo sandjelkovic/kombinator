@@ -15,7 +15,7 @@ import strikt.assertions.isNotEmpty
 fun Assertion.Builder<String>.isEqualToOneOf(possibilities: Collection<String>): Assertion.Builder<String> =
     assertThat("Value is not present") { actual -> possibilities.contains(actual) }
 
-fun <T : Collection<E>, E : Any> Assertion.Builder<T>.isSortedAccordingTo(comparator: Comparator<E>) = isNotEmpty()
+fun <T : Collection<E>, E : Any> Assertion.Builder<T>.isSorted(comparator: Comparator<E>) = isNotEmpty()
     .assert("is sorted") { actual ->
         for (index in 0 until (actual.size - 1)) {
             if (comparator.compare(actual.elementAt(index), actual.elementAt(index + 1)) > 0)

@@ -9,7 +9,7 @@ import com.sandjelkovic.kombinator.domain.repository.SlotRepository
 import com.sandjelkovic.kombinator.test.isEqualToOneOf
 import com.sandjelkovic.kombinator.test.isLeft
 import com.sandjelkovic.kombinator.test.isRight
-import com.sandjelkovic.kombinator.test.isSortedAccordingTo
+import com.sandjelkovic.kombinator.test.isSorted
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
@@ -55,7 +55,7 @@ class DefaultSlotServiceUnitTest {
                 get { combination!!.uuid }.isEqualTo(existingCombination.uuid)
                 get { name }.isEqualToOneOf(listOf("CPU", "GPU"))
             }
-            .isSortedAccordingTo(Comparator.comparing<Slot, Int> { it.position })
+            .isSorted(Comparator.comparing<Slot, Int> { it.position })
     }
 
     @Test
