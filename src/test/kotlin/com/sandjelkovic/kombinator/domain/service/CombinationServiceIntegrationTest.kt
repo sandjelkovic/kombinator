@@ -2,9 +2,9 @@ package com.sandjelkovic.kombinator.domain.service
 
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import com.sandjelkovic.kombinator.test.isDefined
-import com.sandjelkovic.kombinator.test.isEmpty
+import com.sandjelkovic.kombinator.test.isNone
 import com.sandjelkovic.kombinator.test.isRight
+import com.sandjelkovic.kombinator.test.isSome
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,7 +57,7 @@ class CombinationServiceIntegrationTest {
 
         val option = service.getCombinationByInternalId(savedCombination.id!!)
 
-        expectThat(option).isDefined {
+        expectThat(option).isSome {
             get { uuid }.isNotNull().isEqualTo(randomUUID)
             // Hibernate and it's proxies...
             get { copy() }.propertiesAreEqualTo(savedCombination)
@@ -68,7 +68,7 @@ class CombinationServiceIntegrationTest {
     fun getByInternalIdNonExisting() {
         val option = service.getCombinationByInternalId(invalidId)
 
-        expectThat(option).isEmpty()
+        expectThat(option).isNone()
     }
 
     @Test
@@ -98,7 +98,7 @@ class CombinationServiceIntegrationTest {
 
         val option = service.findByUUID(randomUUID)
 
-        expectThat(option).isDefined {
+        expectThat(option).isSome {
             get { uuid }.isNotNull().isEqualTo(randomUUID)
             // Hibernate and it's proxies...
             get { copy() }.propertiesAreEqualTo(savedCombination)
@@ -109,7 +109,7 @@ class CombinationServiceIntegrationTest {
     fun findByUUIDNonExisting() {
         val option = service.findByUUID(UUID.randomUUID().toString())
 
-        expectThat(option).isEmpty()
+        expectThat(option).isNone()
     }
 
 

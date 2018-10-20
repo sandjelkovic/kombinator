@@ -3,7 +3,10 @@ package com.sandjelkovic.kombinator.domain.service.impl
 import com.sandjelkovic.kombinator.domain.exception.DomainValidationException
 import com.sandjelkovic.kombinator.domain.model.Combination
 import com.sandjelkovic.kombinator.domain.repository.CombinationRepository
-import com.sandjelkovic.kombinator.test.*
+import com.sandjelkovic.kombinator.test.isLeft
+import com.sandjelkovic.kombinator.test.isNone
+import com.sandjelkovic.kombinator.test.isRight
+import com.sandjelkovic.kombinator.test.isSome
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -38,7 +41,7 @@ class DefaultCombinationServiceUnitTest {
     fun `Should retrieve a Combination via ID`() {
         val option = service.getCombinationByInternalId(existingId)
 
-        expectThat(option).isDefined {
+        expectThat(option).isSome {
             isEqualTo(existingCombination)
             get { id }.isNotNull().isEqualTo(existingId)
         }
@@ -50,7 +53,7 @@ class DefaultCombinationServiceUnitTest {
     fun `Should not find any Combination and return None`() {
         val option = service.getCombinationByInternalId(invalidId)
 
-        expectThat(option).isEmpty()
+        expectThat(option).isNone()
 
         verify(exactly = 1) { repositoryMock.findById(invalidId) }
     }
@@ -59,7 +62,7 @@ class DefaultCombinationServiceUnitTest {
     fun `Should not call try to retrieve if the ID is negative`() {
         val option = service.getCombinationByInternalId(negativeId)
 
-        expectThat(option).isEmpty()
+        expectThat(option).isNone()
 
         verify(exactly = 0) { repositoryMock.findById(negativeId) }
     }
@@ -97,7 +100,7 @@ class DefaultCombinationServiceUnitTest {
 
         val option = service.findByUUID(uuidString)
 
-        expectThat(option).isDefined {
+        expectThat(option).isSome {
             get { uuid }.isEqualTo(uuidString)
             get { name }.isEqualTo("Name")
             isEqualTo(mockedCombination)
@@ -133,7 +136,7 @@ class DefaultCombinationServiceUnitTest {
 
         val option = service.findByUUID(randomUUID)
 
-        expectThat(option).isEmpty()
+        expectThat(option).isNone()
 
         verify(exactly = 1) { repositoryMock.findByUuid(randomUUID) }
     }

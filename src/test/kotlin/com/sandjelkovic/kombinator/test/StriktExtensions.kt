@@ -28,16 +28,14 @@ fun <T : Collection<E>, E : Any> Assertion.Builder<T>.isSortedAccordingTo(compar
     }
 
 // Arrow
-fun <T> Assertion.Builder<Option<T>>.isDefined(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =
-    assertThat("is present") { it.isDefined() }
+fun <T> Assertion.Builder<Option<T>>.isSome(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =
+    assertThat("is Some") { it.isDefined() }
         .isA<Some<T>>()
         .get { t }
         .and(valueAssertions)
 
-fun <T> Assertion.Builder<Option<T>>.isEmpty(): Assertion.Builder<Option<T>> =
-    assertThat("is empty") { it.isEmpty() }
-
-fun <T> Assertion.Builder<Option<T>>.isNone(): Assertion.Builder<Option<T>> = isEmpty()
+fun <T> Assertion.Builder<Option<T>>.isNone(): Assertion.Builder<Option<T>> =
+    assertThat("is None") { it.isEmpty() }
 
 fun <L, R> Assertion.Builder<Either<L, R>>.isRight(valueAssertions: Assertion.Builder<R>.() -> Unit = {}): Assertion.Builder<R> =
     assertThat("is Right") { it.isRight() }
