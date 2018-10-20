@@ -5,6 +5,7 @@ import arrow.core.Option
 import arrow.core.Some
 import strikt.api.Assertion
 import strikt.assertions.isA
+import strikt.assertions.isNotEmpty
 
 /**
  * @author sandjelkovic
@@ -13,6 +14,18 @@ import strikt.assertions.isA
 
 fun Assertion.Builder<String>.isEqualToOneOf(possibilities: Collection<String>): Assertion.Builder<String> =
     assertThat("Value is not present") { actual -> possibilities.contains(actual) }
+
+fun <T : Collection<E>, E : Any> Assertion.Builder<T>.isSortedAccordingTo(comparator: Comparator<E>) = isNotEmpty()
+    .assert("is sorted") { actual ->
+        for (index in 0 until (actual.size - 1)) {
+            if (comparator.compare(actual.elementAt(index), actual.elementAt(index + 1)) > 0)
+                fail(
+                    actual,
+                    "${actual.elementAt(index)} is greater than ${actual.elementAt(index + 1)}"
+                )
+        }
+        pass()
+    }
 
 // Arrow
 fun <T> Assertion.Builder<Option<T>>.isDefined(valueAssertions: Assertion.Builder<T>.() -> Unit = {}): Assertion.Builder<T> =

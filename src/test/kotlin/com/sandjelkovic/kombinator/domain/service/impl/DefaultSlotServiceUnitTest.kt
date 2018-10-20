@@ -9,14 +9,14 @@ import com.sandjelkovic.kombinator.domain.repository.SlotRepository
 import com.sandjelkovic.kombinator.test.isEqualToOneOf
 import com.sandjelkovic.kombinator.test.isLeft
 import com.sandjelkovic.kombinator.test.isRight
+import com.sandjelkovic.kombinator.test.isSortedAccordingTo
 import io.mockk.every
 import io.mockk.mockk
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import strikt.api.expectThat
 import strikt.assertions.*
 import java.util.*
-import java.util.Comparator.comparing
+import kotlin.Comparator
 
 /**
  * @author sandjelkovic
@@ -31,9 +31,9 @@ class DefaultSlotServiceUnitTest {
 
     private val mockSlotRepository = mockk<SlotRepository>().also {
         every { it.findByCombinationUuid(existingCombination.uuid!!) } returns listOf(
-			Slot(name = "GPU", combination = existingCombination, position = 2),
-			Slot(name = "CPU", combination = existingCombination, position = 1)
-		)
+            Slot(name = "GPU", combination = existingCombination, position = 2),
+            Slot(name = "CPU", combination = existingCombination, position = 1)
+        )
         every { it.save(eq(slotWithCombination)) } returns slotAfterSaving
     }
 
@@ -55,8 +55,7 @@ class DefaultSlotServiceUnitTest {
                 get { combination!!.uuid }.isEqualTo(existingCombination.uuid)
                 get { name }.isEqualToOneOf(listOf("CPU", "GPU"))
             }
-//      no replacement in Strikt for this yet
-        assertThat(slots).isSortedAccordingTo(comparing<Slot, Int> { it.position })
+            .isSortedAccordingTo(Comparator.comparing<Slot, Int> { it.position })
     }
 
     @Test
