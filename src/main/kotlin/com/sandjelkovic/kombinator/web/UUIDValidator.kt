@@ -2,6 +2,7 @@ package com.sandjelkovic.kombinator.web
 
 import arrow.core.*
 import arrow.data.Validated
+import arrow.instances.either.monadError.monadError
 import arrow.typeclasses.binding
 import java.util.*
 
