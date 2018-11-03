@@ -1,7 +1,7 @@
 buildscript {
     ext {
         kotlinVersion = '1.2.70'
-        springBootVersion = '2.0.4.RELEASE'
+        springBootVersion = '2.1.0.RELEASE'
         arrowVersion = '0.7.3'
         mockkVersion = '1.8.7'
         striktVersion = '0.16.2'
