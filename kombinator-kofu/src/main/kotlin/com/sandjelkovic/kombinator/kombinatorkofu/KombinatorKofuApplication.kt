@@ -11,6 +11,6 @@ val app = application {
     }
 }
 
-fun main(): Unit {
+fun main(){
     app.run()
 }
