@@ -37,11 +37,6 @@ subprojects {
         repositories {
             mavenCentral()
         }
-        dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-            classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-            classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-        }
     }
 
     apply plugin: 'kotlin'

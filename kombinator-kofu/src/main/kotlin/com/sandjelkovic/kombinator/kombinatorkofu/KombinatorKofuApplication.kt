@@ -1,11 +1,16 @@
 package com.sandjelkovic.kombinator.kombinatorkofu
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
+import org.springframework.fu.kofu.application
+import org.springframework.fu.kofu.web.server
 
-@SpringBootApplication
-class KombinatorKofuApplication
+val app = application {
+    server {
+        router {
+            GET("/") { ok().syncBody("Hello world!") }
+        }
+    }
+}
 
-fun main(args: Array<String>) {
-    runApplication<KombinatorKofuApplication>(*args)
+fun main(): Unit {
+    app.run()
 }
