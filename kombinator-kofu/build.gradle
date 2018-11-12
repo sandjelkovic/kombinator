@@ -42,10 +42,33 @@ repositories {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-webflux')
     implementation("org.springframework.fu:spring-fu-kofu:0.0.3.BUILD-SNAPSHOT")
+    implementation("org.springframework.data:spring-data-r2dbc:1.0.0.BUILD-SNAPSHOT")
+    implementation("io.r2dbc:r2dbc-spi:1.0.0.M5")
+    implementation("io.r2dbc:r2dbc-postgresql:1.0.0.M5")
+//    implementation("io.r2dbc:r2dbc-h2:1.0.0.M5")
+
     implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation ('com.h2database:h2')
+
+
+
+//	Arrow
+    compile("io.arrow-kt:arrow-core:${arrowVersion}")
+    compile("io.arrow-kt:arrow-syntax:${arrowVersion}")
+    compile("io.arrow-kt:arrow-typeclasses:${arrowVersion}")
+    compile("io.arrow-kt:arrow-data:${arrowVersion}")
+    compile("io.arrow-kt:arrow-instances-core:${arrowVersion}")
+    compile("io.arrow-kt:arrow-instances-data:${arrowVersion}")
+    compile("io.arrow-kt:arrow-optics:${arrowVersion}")
+    compile("io.arrow-kt:arrow-generic:${arrowVersion}")
+
+//	Test
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('io.projectreactor:reactor-test')
+    testImplementation("io.strikt:strikt-core:${striktVersion}")
+//    testImplementation("io.strikt:strikt-java-time:${striktVersion}")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
+
+    implementation ('com.h2database:h2')
 }
