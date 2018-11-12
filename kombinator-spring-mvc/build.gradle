@@ -1,0 +1,51 @@
+sourceCompatibility = 1.8
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+//	Spring
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+
+    compile('io.springfox:springfox-swagger2:2.7.0')
+    compile('io.springfox:springfox-swagger-ui:2.7.0')
+
+//	Kotlin
+    compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("org.jetbrains.kotlin:kotlin-reflect")
+
+//	Arrow
+    compile("io.arrow-kt:arrow-core:${arrowVersion}")
+    compile("io.arrow-kt:arrow-syntax:${arrowVersion}")
+    compile("io.arrow-kt:arrow-typeclasses:${arrowVersion}")
+    compile("io.arrow-kt:arrow-data:${arrowVersion}")
+    compile("io.arrow-kt:arrow-instances-core:${arrowVersion}")
+    compile("io.arrow-kt:arrow-instances-data:${arrowVersion}")
+    compile("io.arrow-kt:arrow-optics:${arrowVersion}")
+    compile("io.arrow-kt:arrow-generic:${arrowVersion}")
+
+//	Test
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testImplementation('org.springframework.security:spring-security-test')
+    testImplementation("io.strikt:strikt-core:${striktVersion}")
+//    testImplementation("io.strikt:strikt-java-time:${striktVersion}")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
+
+//	DB
+    runtime('com.h2database:h2')
+}

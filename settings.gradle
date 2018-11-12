@@ -1,1 +1,5 @@
-rootProject.name = 'kombinator'
+ rootProject.name = 'kombinator'
+
+ include 'kombinator-spring-mvc'
+// include 'kombinator-webflux'
+// include 'kombinator-r2dbc'
