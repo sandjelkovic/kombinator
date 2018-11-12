@@ -7,7 +7,7 @@ Written in Kotlin with Spring Boot.
 
 ## Running the application
 
-Application can be started by running `./mvnw spring-boot:run`. Application can be found on `http://localhost:8080/`
+Application can be started by running `./gradlew bootRun` or just running the `main` method in one of the variant directories. Application can be found on `http://localhost:8080/`
 
 ## API documentation
 
