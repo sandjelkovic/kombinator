@@ -1,7 +1,7 @@
 package com.sandjelkovic.kombinator.web
 
-import arrow.data.Valid
-import arrow.data.Validated
+import com.sandjelkovic.kombinator.test.isInvalid
+import com.sandjelkovic.kombinator.test.isValid
 import org.junit.Test
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -21,35 +21,35 @@ class UUIDValidatorTest {
         val randomUUID = UUID.randomUUID()!!
         val validated = validator.validate(randomUUID.toString())
 
-        expectThat(validated)
-            .isA<Valid<UUID>>()
-            .get { a }.isEqualTo(randomUUID)
+        expectThat(validated).isValid {
+            isEqualTo(randomUUID)
+        }
     }
 
     @Test
     fun `Should be Invalid for empty UUID`() {
         val validated = validator.validate("")
 
-        expectThat(validated)
-            .isA<Validated.Invalid<ValidationException>>()
-            .get { e }.isA<EmptyParameterException>()
+        expectThat(validated).isInvalid {
+            isA<EmptyParameterException>()
+        }
     }
 
     @Test
     fun `Should be Invalid for blank UUID`() {
         val validated = validator.validate("            ")
 
-        expectThat(validated)
-            .isA<Validated.Invalid<ValidationException>>()
-            .get { e }.isA<EmptyParameterException>()
+        expectThat(validated).isInvalid {
+            isA<EmptyParameterException>()
+        }
     }
 
     @Test
     fun `Should be Invalid for malformed UUID`() {
         val validated = validator.validate("malformed-uuid")
 
-        expectThat(validated)
-            .isA<Validated.Invalid<ValidationException>>()
-            .get { e }.isA<InvalidUuidException>()
+        expectThat(validated).isInvalid {
+            isA<InvalidUuidException>()
+        }
     }
 }
