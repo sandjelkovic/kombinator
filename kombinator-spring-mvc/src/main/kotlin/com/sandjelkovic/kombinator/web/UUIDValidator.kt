@@ -1,9 +1,11 @@
 package com.sandjelkovic.kombinator.web
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.filterOrElse
 import arrow.data.Validated
-import arrow.instances.either.monadError.monadError
-import arrow.typeclasses.binding
+import arrow.instances.either.monad.binding
 import java.util.*
 
 /**
@@ -13,11 +15,11 @@ import java.util.*
 
 class UUIDValidator {
     fun validateUuid(target: String): Validated<ValidationException, UUID> = Validated.fromEither(
-        Either.monadError<ValidationException>().binding {
+        binding {
             Right(target).filterOrElse({ it.isNotEmpty() }) { EmptyParameterException }.bind()
             Right(target).filterOrElse({ it.isNotBlank() }) { EmptyParameterException }.bind()
             Try { UUID.fromString(target) }.fold({ Left(InvalidUuidException) }, { Right(it!!) }).bind()
-        }.fix()
+        }
     )
 }
 
