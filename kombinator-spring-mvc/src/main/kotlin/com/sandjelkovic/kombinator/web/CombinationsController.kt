@@ -25,7 +25,7 @@ class CombinationsController(
 
     @GetMapping("/{uuid}")
     fun getCombination(@PathVariable uuid: String): ResponseEntity<Resource<Combination>> =
-        uuidValidator.validateUuid(uuid)
+        uuidValidator.validate(uuid)
             .fold(
                 { ResponseEntity.badRequest().build<Resource<Combination>>() },
                 { validUuid ->

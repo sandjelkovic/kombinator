@@ -27,7 +27,7 @@ class SlotsController(
 
     @GetMapping
     fun getSlots(@PathVariable uuid: String): ResponseEntity<Resources<Slot>> =
-        uuidValidator.validateUuid(uuid)
+        uuidValidator.validate(uuid)
             .fold(
                 { ResponseEntity.badRequest().build<Resources<Slot>>() },
                 { validUuid ->
@@ -42,7 +42,7 @@ class SlotsController(
     @PostMapping
     @PutMapping
     fun addSlots(@Valid @RequestBody slot: Slot, @PathVariable uuid: String): ResponseEntity<Void> =
-        uuidValidator.validateUuid(uuid)
+        uuidValidator.validate(uuid)
             .fold(
                 { ResponseEntity.badRequest().build<Void>() },
                 { validUuid ->

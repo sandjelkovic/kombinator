@@ -19,7 +19,7 @@ class UUIDValidatorTest {
     @Test
     fun `Should validate the correct UUID`() {
         val randomUUID = UUID.randomUUID()!!
-        val validated = validator.validateUuid(randomUUID.toString())
+        val validated = validator.validate(randomUUID.toString())
 
         expectThat(validated)
             .isA<Valid<UUID>>()
@@ -28,7 +28,7 @@ class UUIDValidatorTest {
 
     @Test
     fun `Should be Invalid for empty UUID`() {
-        val validated = validator.validateUuid("")
+        val validated = validator.validate("")
 
         expectThat(validated)
             .isA<Validated.Invalid<ValidationException>>()
@@ -37,7 +37,7 @@ class UUIDValidatorTest {
 
     @Test
     fun `Should be Invalid for blank UUID`() {
-        val validated = validator.validateUuid("            ")
+        val validated = validator.validate("            ")
 
         expectThat(validated)
             .isA<Validated.Invalid<ValidationException>>()
@@ -46,7 +46,7 @@ class UUIDValidatorTest {
 
     @Test
     fun `Should be Invalid for malformed UUID`() {
-        val validated = validator.validateUuid("malformed-uuid")
+        val validated = validator.validate("malformed-uuid")
 
         expectThat(validated)
             .isA<Validated.Invalid<ValidationException>>()

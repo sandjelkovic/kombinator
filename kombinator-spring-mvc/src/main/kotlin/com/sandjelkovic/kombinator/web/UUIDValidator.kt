@@ -14,7 +14,7 @@ import java.util.*
  */
 
 class UUIDValidator {
-    fun validateUuid(target: String): Validated<ValidationException, UUID> = Validated.fromEither(
+    fun validate(target: String): Validated<ValidationException, UUID> = Validated.fromEither(
         binding {
             Right(target).filterOrElse({ it.isNotEmpty() }) { EmptyParameterException }.bind()
             Right(target).filterOrElse({ it.isNotBlank() }) { EmptyParameterException }.bind()
